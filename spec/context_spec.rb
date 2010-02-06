@@ -15,6 +15,12 @@ describe "IRB::Context" do
     eval("y", @context.binding).should == :ok
   end
   
+  it "initializes with an 'empty' state" do
+    @context.line.should == 1
+    @context.source.should.be.instance_of IRB::Source
+    @context.source.to_s.should == ""
+  end
+  
   it "does not use the same binding copy of the top level object" do
     lambda { eval("x", @context.binding) }.should.raise NameError
   end
