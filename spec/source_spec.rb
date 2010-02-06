@@ -21,7 +21,7 @@ describe "IRB::Source" do
     @source.buffer.should == %w{ foo bar }
   end
   
-  it "returns the full buffered source, joined by a newline" do
+  it "returns the full buffered source, joined by newlines" do
     @source.source.should == ""
     @source << "foo\n"
     @source.source.should == "foo"
@@ -104,5 +104,34 @@ describe "IRB::Source::Reflector" do
     reflect("class A; class B; def bar").level.should == 3
     reflect("class A; class B; def bar; p :ok; end").level.should == 2
     reflect("class A; class B; def bar; p :ok; end; end; end").level.should == 0
+  end
+  
+  it "correctly increases and decreases the code block indentation level for keywords" do
+    [
+      "class A",
+      "module A",
+      "def foo",
+      "begin",
+      "if x == :ok",
+      "unless x == :ko",
+      "case x",
+      "while x",
+      "for x in xs",
+      "x.each do"
+    ].each do |open|
+      reflect(open).level.should == 1
+      reflect("#{open}\nend").level.should == 0
+    end
+  end
+  
+  it "correctly increases and decreases the code block indentation level for literals" do
+    [
+      ["lambda { |x|", "}"],
+      ["{", "}"],
+      ["[", "]"]
+    ].each do |open, close|
+      reflect(open).level.should == 1
+      reflect("#{open}\n#{close}").level.should == 0
+    end
   end
 end

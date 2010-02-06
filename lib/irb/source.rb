@@ -65,13 +65,35 @@ module IRB
         @valid
       end
       
+      INCREASE_LEVEL_KEYWORDS = %w{ class module def begin if unless case while for do }
+      
       def on_kw(token) #:nodoc:
         case token
-        when "class", "def"
+        when *INCREASE_LEVEL_KEYWORDS
           @level += 1
         when "end"
           @level -= 1
         end
+        super
+      end
+      
+      def on_lbracket(token) #:nodoc:
+        @level += 1
+        super
+      end
+      
+      def on_rbracket(token) #:nodoc:
+        @level -= 1
+        super
+      end
+      
+      def on_lbrace(token) #:nodoc:
+        @level += 1
+        super
+      end
+      
+      def on_rbrace(token) #:nodoc:
+        @level -= 1
         super
       end
     end
