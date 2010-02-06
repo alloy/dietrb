@@ -1,4 +1,5 @@
 require File.expand_path('../spec_helper', __FILE__)
+require 'tempfile'
 
 main = self
 
@@ -47,5 +48,36 @@ describe "IRB::Context" do
     @context.prompt.should == "irb(main):001:0> "
     o = Object.new
     IRB::Context.new(o).prompt.should == "irb(#{o.inspect}):001:0> "
+  end
+end
+
+class << Readline
+  attr_reader :received
+  
+  def stub_input(*input)
+    @input = input
+  end
+  
+  def readline(prompt, history)
+    @received = [prompt, history]
+    @input.shift
+  end
+end
+
+describe "IRB::Context, running in a simple readline loop" do
+  before do
+    @context = IRB::Context.new(main)
+  end
+  
+  it "prints the prompt, reads a line, saves it to the history and returns it" do
+    Readline.stub_input("def foo")
+    @context.readline.should == "def foo"
+    Readline.received.should == ["irb(main):001:0> ", true]
+  end
+  
+  it "adds the received code, as long as available, to the source buffer while running" do
+    Readline.stub_input("def foo", "p :ok")
+    @context.run
+    @context.source.to_s.should == "def foo\np :ok"
   end
 end
