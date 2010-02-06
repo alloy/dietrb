@@ -1,10 +1,4 @@
-require 'rubygems'
-require 'bacon'
-
-ROOT = File.expand_path('../../', __FILE__)
-$:.unshift File.join(ROOT, 'lib')
-
-require 'irb/source'
+require File.expand_path('../spec_helper', __FILE__)
 
 describe "IRB::Source" do
   before do
