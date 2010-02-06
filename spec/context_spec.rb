@@ -34,4 +34,18 @@ describe "IRB::Context" do
     def o.to_s; "self"; end
     @context.evaluate(o).should == main
   end
+  
+  it "returns a prompt string, displaying line number and code indentation level" do
+    @context.prompt.should == "irb(main):001:0> "
+    @context.instance_variable_set(:@line, 23)
+    @context.prompt.should == "irb(main):023:0> "
+    @context.source << "def foo"
+    @context.prompt.should == "irb(main):023:1> "
+  end
+  
+  it "describes the context's object in the prompt" do
+    @context.prompt.should == "irb(main):001:0> "
+    o = Object.new
+    IRB::Context.new(o).prompt.should == "irb(#{o.inspect}):001:0> "
+  end
 end

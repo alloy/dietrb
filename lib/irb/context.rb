@@ -1,5 +1,7 @@
 module IRB
   class Context
+    PROMPT = "irb(%s):%03d:%d> "
+    
     attr_reader :object, :binding, :line, :source
     
     def initialize(object)
@@ -11,6 +13,10 @@ module IRB
     
     def evaluate(source)
       eval(source.to_s, @binding)
+    end
+    
+    def prompt
+      PROMPT % [@object.inspect, @line, @source.level]
     end
     
     private
