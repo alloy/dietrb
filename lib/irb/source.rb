@@ -3,14 +3,16 @@ require 'ripper'
 module IRB
   class Source
     class Reflector < Ripper::SexpBuilder
+      attr_reader :level
+      
       def initialize(source)
         super
         @level = 0
+        @valid = !parse.nil?
       end
       
-      def level
-        parse
-        @level
+      def valid?
+        @valid
       end
       
       def on_kw(token)
@@ -30,7 +32,9 @@ module IRB
       @buffer = buffer
     end
     
+    # Adds a source line to the buffer and flushes the cached reflection.
     def <<(source)
+      @reflection = nil
       @buffer << source.chomp
     end
     
@@ -39,7 +43,7 @@ module IRB
     end
     
     def level
-      Reflector.new(source).level
+      reflect.level
     end
     
     # This does not take syntax errors in account, but only whether or not the
@@ -53,7 +57,11 @@ module IRB
     #
     #   def foo; p :ok; end
     def valid?
-      !!Reflector.new(source).parse
+      reflect.valid?
+    end
+    
+    def reflect
+      @reflection ||= Reflector.new(source)
     end
   end
 end

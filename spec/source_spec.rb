@@ -66,22 +66,43 @@ describe "IRB::Source" do
     @source << "  end; end"
     @source.level.should == 0
   end
+  
+  it "caches the reflection when possible" do
+    @source << "def foo"
+    reflection = @source.reflect
+    @source.level
+    @source.valid?
+    @source.reflect.should == reflection
+    
+    @source << "end"
+    @source.level
+    new_reflection = @source.reflect
+    new_reflection.should.not == reflection
+    @source.valid?
+    @source.reflect.should == new_reflection
+  end
 end
 
 describe "IRB::Source::Reflector" do
-  def level(source)
-    IRB::Source::Reflector.new(source).level
+  def reflect(source)
+    IRB::Source::Reflector.new(source)
+  end
+  
+  it "returns whether or not the source is a valid code block" do
+    reflect("def foo").should.not.be.valid
+    reflect("def foo; p :ok").should.not.be.valid
+    reflect("def foo; p :ok; end").should.be.valid
   end
   
   it "returns the code block indentation level" do
-    level("").should == 0
-    level("class A").should == 1
-    level("class A; def foo").should == 2
-    level("class A; def foo; p :ok").should == 2
-    level("class A; def foo; p :ok; end").should == 1
-    level("class A; class B").should == 2
-    level("class A; class B; def bar").should == 3
-    level("class A; class B; def bar; p :ok; end").should == 2
-    level("class A; class B; def bar; p :ok; end; end; end").should == 0
+    reflect("").level.should == 0
+    reflect("class A").level.should == 1
+    reflect("class A; def foo").level.should == 2
+    reflect("class A; def foo; p :ok").level.should == 2
+    reflect("class A; def foo; p :ok; end").level.should == 1
+    reflect("class A; class B").level.should == 2
+    reflect("class A; class B; def bar").level.should == 3
+    reflect("class A; class B; def bar; p :ok; end").level.should == 2
+    reflect("class A; class B; def bar; p :ok; end; end; end").level.should == 0
   end
 end
