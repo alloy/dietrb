@@ -46,4 +46,42 @@ describe "IRB::Source" do
       IRB::Source.new(buffer).should.not.be.valid
     end
   end
+  
+  it "returns the current code block indentation level" do
+    @source.level.should == 0
+    @source << "class A"
+    @source.level.should == 1
+    @source << "  def foo"
+    @source.level.should == 2
+    @source << "    p :ok"
+    @source.level.should == 2
+    @source << "  end"
+    @source.level.should == 1
+    @source << "  class B"
+    @source.level.should == 2
+    @source << "    def bar"
+    @source.level.should == 3
+    @source << "      p :ok; end"
+    @source.level.should == 2
+    @source << "  end; end"
+    @source.level.should == 0
+  end
+end
+
+describe "IRB::Source::Reflector" do
+  def level(source)
+    IRB::Source::Reflector.new(source).level
+  end
+  
+  it "returns the code block indentation level" do
+    level("").should == 0
+    level("class A").should == 1
+    level("class A; def foo").should == 2
+    level("class A; def foo; p :ok").should == 2
+    level("class A; def foo; p :ok; end").should == 1
+    level("class A; class B").should == 2
+    level("class A; class B; def bar").should == 3
+    level("class A; class B; def bar; p :ok; end").should == 2
+    level("class A; class B; def bar; p :ok; end; end; end").should == 0
+  end
 end
