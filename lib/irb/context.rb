@@ -8,7 +8,7 @@ module IRB
     end
     
     def evaluate(source)
-      eval(source, @binding)
+      eval(source.to_s, @binding)
     end
   end
 end

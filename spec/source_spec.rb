@@ -23,6 +23,12 @@ describe "IRB::Source" do
     @source.source.should == "foo\nbar"
   end
   
+  it "aliases #to_s to #source" do
+    @source << "foo"
+    @source << "bar"
+    @source.to_s.should == "foo\nbar"
+  end
+  
   it "returns that the accumulated source is a valid code block" do
     [
       ["def foo", "p :ok", "end"],

@@ -22,4 +22,10 @@ describe "IRB::Context" do
   it "evaluates code with the object's binding" do
     @context.evaluate("self").should == main
   end
+  
+  it "coerces the given source to a string first" do
+    o = Object.new
+    def o.to_s; "self"; end
+    @context.evaluate(o).should == main
+  end
 end

@@ -19,6 +19,8 @@ module IRB
       @buffer.join("\n")
     end
     
+    alias_method :to_s, :source
+    
     # Reflects on the accumulated source and returns the current code block
     # indentation level.
     def level
