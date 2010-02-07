@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{dietrb}
-  s.version = "0.1.1"
+  s.version = "0.1.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Eloy Duran"]
@@ -29,6 +29,7 @@ Gem::Specification.new do |s|
      "lib/irb/ext/macruby.rb",
      "lib/irb/source.rb",
      "spec/context_spec.rb",
+     "spec/irb_spec.rb",
      "spec/source_spec.rb",
      "spec/spec_helper.rb"
   ]
@@ -40,6 +41,7 @@ Gem::Specification.new do |s|
   s.summary = %q{IRB on a diet, for MacRuby / Ruby 1.9}
   s.test_files = [
     "spec/context_spec.rb",
+     "spec/irb_spec.rb",
      "spec/source_spec.rb",
      "spec/spec_helper.rb"
   ]
