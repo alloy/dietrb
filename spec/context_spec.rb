@@ -39,15 +39,34 @@ describe "IRB::Context" do
     o = Object.new
     IRB::Context.new(o).prompt.should == "irb(#{o.inspect}):001:0> "
   end
+  
+  it "returns a formatted exception message" do
+    begin; DoesNotExist; rescue NameError => e; exception = e; end
+    @context.format_exception(exception).should ==
+      "NameError: uninitialized constant Bacon::Context::DoesNotExist\n\t#{exception.backtrace.join("\n\t")}"
+  end
 end
 
 describe "IRB::Context, when evaluating source" do
   before do
     @context = IRB::Context.new(main)
+    def @context.puts(string); @printed = string; end
   end
   
   it "evaluates code with the object's binding" do
     @context.evaluate("self").should == main
+  end
+  
+  it "prints the result" do
+    @context.evaluate("Hash[:foo, :foo]")
+    printed = @context.instance_variable_get(:@printed)
+    printed.should == "=> {:foo=>:foo}"
+  end
+  
+  it "assigns the result to the local variable `_'" do
+    result = @context.evaluate("Object.new")
+    @context.evaluate("_").should == result
+    @context.evaluate("_").should == result
   end
   
   it "coerces the given source to a string first" do
@@ -61,6 +80,12 @@ describe "IRB::Context, when evaluating source" do
       @context.evaluate("DoesNotExist")
       @context.evaluate("raise Exception")
     }.should.not.raise
+  end
+  
+  it "prints the exception that occurs" do
+    @context.evaluate("DoesNotExist")
+    printed = @context.instance_variable_get(:@printed)
+    printed.should.match /^NameError: uninitialized constant DoesNotExist/
   end
 end
 

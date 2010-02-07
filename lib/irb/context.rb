@@ -12,9 +12,11 @@ module IRB
     end
     
     def evaluate(source)
-      eval(source.to_s, @binding)
+      result = eval("_ = (#{source})", @binding)
+      puts "=> #{result.inspect}"
+      result
     rescue Exception => e
-      
+      puts format_exception(e)
     end
     
     def readline
@@ -39,6 +41,10 @@ module IRB
     
     def prompt
       PROMPT % [@object.inspect, @line, @source.level]
+    end
+    
+    def format_exception(e)
+      "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
     end
     
     private
