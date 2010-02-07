@@ -13,6 +13,8 @@ module IRB
     
     def evaluate(source)
       eval(source.to_s, @binding)
+    rescue Exception => e
+      
     end
     
     def readline

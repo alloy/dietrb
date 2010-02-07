@@ -26,16 +26,6 @@ describe "IRB::Context" do
     lambda { eval("x", @context.binding) }.should.raise NameError
   end
   
-  it "evaluates code with the object's binding" do
-    @context.evaluate("self").should == main
-  end
-  
-  it "coerces the given source to a string first" do
-    o = Object.new
-    def o.to_s; "self"; end
-    @context.evaluate(o).should == main
-  end
-  
   it "returns a prompt string, displaying line number and code indentation level" do
     @context.prompt.should == "irb(main):001:0> "
     @context.instance_variable_set(:@line, 23)
@@ -48,6 +38,29 @@ describe "IRB::Context" do
     @context.prompt.should == "irb(main):001:0> "
     o = Object.new
     IRB::Context.new(o).prompt.should == "irb(#{o.inspect}):001:0> "
+  end
+end
+
+describe "IRB::Context, when evaluating source" do
+  before do
+    @context = IRB::Context.new(main)
+  end
+  
+  it "evaluates code with the object's binding" do
+    @context.evaluate("self").should == main
+  end
+  
+  it "coerces the given source to a string first" do
+    o = Object.new
+    def o.to_s; "self"; end
+    @context.evaluate(o).should == main
+  end
+  
+  it "rescues any type of exception" do
+    lambda {
+      @context.evaluate("DoesNotExist")
+      @context.evaluate("raise Exception")
+    }.should.not.raise
   end
 end
 
