@@ -75,19 +75,27 @@ describe "IRB::Context, when receiving input" do
     Readline.received.should == ["irb(main):001:0> ", true]
   end
   
-  it "adds the received code, as long as available, to the source buffer while running" do
-    Readline.stub_input("def foo", "p :ok")
+  it "processes the output" do
+    Readline.stub_input("def foo")
+    def @context.process_line(line); @received = line; end
     @context.run
+    @context.instance_variable_get(:@received).should == "def foo"
+  end
+  
+  it "adds the received code to the source buffer" do
+    @context.process_line("def foo")
+    @context.process_line("p :ok")
     @context.source.to_s.should == "def foo\np :ok"
   end
   
   it "evaluates the buffered source once it's a valid code block" do
-    Readline.stub_input("def foo", ":ok", "end; p foo")
-    def @context.evaluate(source)
-      @evaled_source = source
-    end
-    @context.run
-    source = @context.instance_variable_get(:@evaled_source)
+    def @context.evaluate(source); @evaled = source; end
+    
+    @context.process_line("def foo")
+    @context.process_line(":ok")
+    @context.process_line("end; p foo")
+    
+    source = @context.instance_variable_get(:@evaled)
     source.to_s.should == "def foo\n:ok\nend; p foo"
   end
 end

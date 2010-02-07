@@ -21,11 +21,15 @@ module IRB
     
     def run
       while line = readline
-        @source << line
-        if @source.valid?
-          evaluate(@source)
-          clear_buffer
-        end
+        process_line(line)
+      end
+    end
+    
+    def process_line(line)
+      @source << line
+      if @source.valid?
+        evaluate(@source)
+        clear_buffer
       end
     end
     
