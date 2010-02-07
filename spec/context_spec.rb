@@ -64,7 +64,7 @@ class << Readline
   end
 end
 
-describe "IRB::Context, running in a simple readline loop" do
+describe "IRB::Context, when receiving input" do
   before do
     @context = IRB::Context.new(main)
   end
@@ -79,5 +79,15 @@ describe "IRB::Context, running in a simple readline loop" do
     Readline.stub_input("def foo", "p :ok")
     @context.run
     @context.source.to_s.should == "def foo\np :ok"
+  end
+  
+  it "evaluates the buffered source once it's a valid code block" do
+    Readline.stub_input("def foo", ":ok", "end; p foo")
+    def @context.evaluate(source)
+      @evaled_source = source
+    end
+    @context.run
+    source = @context.instance_variable_get(:@evaled_source)
+    source.to_s.should == "def foo\n:ok\nend; p foo"
   end
 end
