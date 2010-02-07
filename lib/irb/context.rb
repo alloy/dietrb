@@ -13,7 +13,7 @@ module IRB
     
     def evaluate(source)
       result = eval("_ = (#{source})", @binding)
-      puts "=> #{result.inspect}"
+      puts format_result(result)
       result
     rescue Exception => e
       puts format_exception(e)
@@ -35,12 +35,17 @@ module IRB
         evaluate(@source)
         clear_buffer
       end
+      @line += 1
     end
     
     PROMPT = "irb(%s):%03d:%d> "
     
     def prompt
       PROMPT % [@object.inspect, @line, @source.level]
+    end
+    
+    def format_result(result)
+      "=> #{result.inspect}"
     end
     
     def format_exception(e)

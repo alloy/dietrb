@@ -126,6 +126,14 @@ describe "IRB::Context, when receiving input" do
     @context.source.to_s.should == "def foo\np :ok"
   end
   
+  it "increases the current line number" do
+    @context.line.should == 1
+    @context.process_line("def foo")
+    @context.line.should == 2
+    @context.process_line("p :ok")
+    @context.line.should == 3
+  end
+  
   it "evaluates the buffered source once it's a valid code block" do
     def @context.evaluate(source); @evaled = source; end
     
