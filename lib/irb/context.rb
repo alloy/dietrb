@@ -25,17 +25,34 @@ module IRB
     
     def run
       while line = readline
-        process_line(line)
+        continue = process_line(line)
+        break unless continue
       end
     end
     
+    # Returns whether or not the user wants to continue the current runloop.
+    # This can only be done at a code block indentation level of 0.
+    #
+    # For instance, this will continue:
+    #
+    #   process_line("def foo") # => true
+    #   process_line("quit") # => true
+    #   process_line("end") # => true
+    #
+    # But at code block indentation level 0, `quit' means exit the runloop:
+    #
+    #   process_line("quit") # => false
     def process_line(line)
       @source << line
+      return false if @source.to_s == "quit"
+      
       if @source.valid?
         evaluate(@source)
         clear_buffer
       end
       @line += 1
+      
+      true
     end
     
     PROMPT = "irb(%s):%03d:%d> "

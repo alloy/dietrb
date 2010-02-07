@@ -115,7 +115,7 @@ describe "IRB::Context, when receiving input" do
   
   it "processes the output" do
     Readline.stub_input("def foo")
-    def @context.process_line(line); @received = line; end
+    def @context.process_line(line); @received = line; false; end
     @context.run
     @context.instance_variable_get(:@received).should == "def foo"
   end
@@ -143,5 +143,20 @@ describe "IRB::Context, when receiving input" do
     
     source = @context.instance_variable_get(:@evaled)
     source.to_s.should == "def foo\n:ok\nend; p foo"
+  end
+  
+  it "returns whether or not the runloop should continue, but only if the level is 0" do
+    @context.process_line("def foo").should == true
+    @context.process_line("quit").should == true
+    @context.process_line("end").should == true
+    
+    @context.process_line("quit").should == false
+  end
+  
+  it "exits the runloop if the user wishes so" do
+    Readline.stub_input("quit", "def foo")
+    def @context.process_line(line); @received = line; super; end
+    @context.run
+    @context.instance_variable_get(:@received).should.not == "def foo"
   end
 end
