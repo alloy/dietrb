@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{dietrb}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Eloy Duran"]
@@ -26,6 +26,7 @@ Gem::Specification.new do |s|
      "dietrb.gemspec",
      "lib/irb.rb",
      "lib/irb/context.rb",
+     "lib/irb/ext/macruby.rb",
      "lib/irb/source.rb",
      "spec/context_spec.rb",
      "spec/source_spec.rb",
