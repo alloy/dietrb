@@ -2,6 +2,10 @@ require 'readline'
 
 module IRB
   class Context
+    class << self
+      attr_accessor :current
+    end
+    
     attr_reader :object, :binding, :line, :source
     
     def initialize(object)
@@ -24,6 +28,7 @@ module IRB
     end
     
     def run
+      self.class.current = self
       while line = readline
         continue = process_line(line)
         break unless continue
