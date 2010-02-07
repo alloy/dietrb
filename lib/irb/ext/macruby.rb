@@ -5,11 +5,15 @@ module IRB
     alias_method :_run, :run
     
     def run
-      Thread.new do
+      if NSApplication.sharedApplication.running?
         _run
-        NSApplication.sharedApplication.terminate(self)
+      else
+        Thread.new do
+          _run
+          NSApplication.sharedApplication.terminate(self)
+        end
+        NSApplication.sharedApplication.run
       end
-      NSApplication.sharedApplication.run
     end
   end
 end
