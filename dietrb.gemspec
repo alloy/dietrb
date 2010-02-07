@@ -18,10 +18,12 @@ Gem::Specification.new do |s|
     "README"
   ]
   s.files = [
-    "README",
+    ".gitignore",
+     "README",
      "Rakefile",
      "VERSION",
      "bin/dietrb",
+     "dietrb.gemspec",
      "lib/irb.rb",
      "lib/irb/context.rb",
      "lib/irb/source.rb",
@@ -32,6 +34,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/alloy/dietrb}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
+  s.required_ruby_version = Gem::Requirement.new("~> 1.9")
   s.rubygems_version = %q{1.3.5}
   s.summary = %q{IRB on a diet, for MacRuby / Ruby 1.9}
   s.test_files = [

@@ -18,6 +18,8 @@ begin
     gemspec.email = "eloy.de.enige@gmail.com"
     gemspec.homepage = "http://github.com/alloy/dietrb"
     gemspec.authors = ["Eloy Duran"]
+    
+    gemspec.required_ruby_version = ::Gem::Requirement.new("~> 1.9")
   end
 rescue LoadError
 end
