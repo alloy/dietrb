@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
 
 require 'irb'
-
-IRB::Context.new(self).run
+IRB(self)
