@@ -1,6 +1,19 @@
 require File.expand_path('../spec_helper', __FILE__)
 require 'tempfile'
 
+class << Readline
+  attr_reader :received
+  
+  def stub_input(*input)
+    @input = input
+  end
+  
+  def readline(prompt, history)
+    @received = [prompt, history]
+    @input.shift
+  end
+end
+
 main = self
 
 describe "IRB::Context" do
@@ -45,6 +58,16 @@ describe "IRB::Context" do
     @context.format_exception(exception).should ==
       "NameError: uninitialized constant Bacon::Context::DoesNotExist\n\t#{exception.backtrace.join("\n\t")}"
   end
+  
+  it "makes itself the current running context during the runloop and resigns once it's done" do
+    IRB::Context.current.should == nil
+    
+    Readline.stub_input("current_during_run = IRB::Context.current")
+    @context.run
+    eval('current_during_run', @context.binding).should == @context
+    
+    IRB::Context.current.should == nil
+  end
 end
 
 describe "IRB::Context, when evaluating source" do
@@ -86,19 +109,6 @@ describe "IRB::Context, when evaluating source" do
     @context.evaluate("DoesNotExist")
     printed = @context.instance_variable_get(:@printed)
     printed.should.match /^NameError: uninitialized constant DoesNotExist/
-  end
-end
-
-class << Readline
-  attr_reader :received
-  
-  def stub_input(*input)
-    @input = input
-  end
-  
-  def readline(prompt, history)
-    @received = [prompt, history]
-    @input.shift
   end
 end
 
