@@ -155,6 +155,17 @@ describe "IRB::Context, when receiving input" do
     source.to_s.should == "def foo\n:ok\nend; p foo"
   end
   
+  it "prints that a syntax error occurred on the last line and reset the buffer to the previous line" do
+    def @context.puts(str); @printed = str; end
+    
+    @context.process_line("def foo")
+    @context.process_line("  };")
+    
+    @context.source.to_s.should == "def foo"
+    printed = @context.instance_variable_get(:@printed)
+    printed.should == "SyntaxError: compile error\n(irb):2: syntax error, unexpected '}'"
+  end
+  
   it "returns whether or not the runloop should continue, but only if the level is 0" do
     @context.process_line("def foo").should == true
     @context.process_line("quit").should == true

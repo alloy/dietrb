@@ -1,5 +1,9 @@
 require File.expand_path('../spec_helper', __FILE__)
 
+class Should
+  alias have be
+end
+
 describe "IRB::Source" do
   before do
     @source = IRB::Source.new
@@ -13,6 +17,13 @@ describe "IRB::Source" do
     @source << "foo\n"
     @source << "bar\r\n"
     @source.buffer.should == %w{ foo bar }
+  end
+  
+  it "removes the last line from the buffer" do
+    @source << "foo\n"
+    @source << "bar\r\n"
+    @source.pop.should == "bar"
+    @source.buffer.should == %w{ foo }
   end
   
   it "returns the full buffered source, joined by newlines" do
@@ -34,7 +45,7 @@ describe "IRB::Source" do
       ["def foo", "p :ok", "end"],
       ["class A; def", "foo(x); p x", "end; end"]
     ].each do |buffer|
-      IRB::Source.new(buffer).should.be.valid
+      IRB::Source.new(buffer).should.be.code_block
     end
   end
   
@@ -43,8 +54,16 @@ describe "IRB::Source" do
       ["def foo", "p :ok"],
       ["class A; def", "foo(x); p x", "end"]
     ].each do |buffer|
-      IRB::Source.new(buffer).should.not.be.valid
+      IRB::Source.new(buffer).should.not.be.code_block
     end
+  end
+  
+  it "returns whether or not the accumulated source contains a syntax error" do
+    @source.should.not.have.syntax_error
+    @source << "def foo"
+    @source.should.not.have.syntax_error
+    @source << "  def;"
+    @source.should.have.syntax_error
   end
   
   it "returns the current code block indentation level" do
@@ -71,20 +90,25 @@ describe "IRB::Source" do
     @source << "def foo"
     reflection = @source.reflect
     @source.level
-    @source.valid?
+    @source.code_block?
     @source.reflect.should == reflection
     
     @source << "end"
     @source.level
     new_reflection = @source.reflect
     new_reflection.should.not == reflection
-    @source.valid?
+    @source.code_block?
+    @source.reflect.should == new_reflection
+    
+    reflection = new_reflection
+    
+    @source.pop
+    @source.level
+    new_reflection = @source.reflect
+    new_reflection.should.not == reflection
+    @source.syntax_error?
     @source.reflect.should == new_reflection
   end
-end
-
-class Should
-  alias have be
 end
 
 describe "IRB::Source::Reflector" do
@@ -106,6 +130,11 @@ describe "IRB::Source::Reflector" do
     reflect("class A; {" ).should.not.have.syntax_error
     reflect("class A def foo").should.have.syntax_error
     reflect("class A; def foo" ).should.not.have.syntax_error
+  end
+  
+  it "returns the actual syntax error message if one occurs" do
+    reflect("def foo").syntax_error.should == nil
+    reflect("}").syntax_error.should == "syntax error, unexpected '}'"
   end
   
   it "returns the code block indentation level" do

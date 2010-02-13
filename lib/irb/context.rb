@@ -59,7 +59,10 @@ module IRB
       @source << line
       return false if @source.to_s == "quit"
       
-      if @source.valid?
+      if @source.syntax_error?
+        puts format_syntax_error(@source.syntax_error)
+        @source.pop
+      elsif @source.code_block?
         evaluate(@source)
         clear_buffer
       end
@@ -80,6 +83,10 @@ module IRB
     
     def format_exception(e)
       "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+    end
+    
+    def format_syntax_error(e)
+      "SyntaxError: compile error\n(irb):#{@line}: #{e}"
     end
     
     private

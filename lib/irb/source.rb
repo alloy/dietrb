@@ -14,6 +14,12 @@ module IRB
       @buffer << source.chomp
     end
     
+    # Removes the last line from the buffer and flushes the cached reflection.
+    def pop
+      @reflection = nil
+      @buffer.pop
+    end
+    
     # Returns the accumulated source as a string, joined by newlines.
     def source
       @buffer.join("\n")
@@ -28,8 +34,19 @@ module IRB
     end
     
     # Reflects on the accumulated source to see if it's a valid code block.
-    def valid?
+    def code_block?
       reflect.code_block?
+    end
+    
+    # Reflects on the accumulated source to see if it contains a syntax error.
+    def syntax_error?
+      reflect.syntax_error?
+    end
+    
+    # Reflects on the accumulated source and returns the actual syntax error
+    # message if one occurs.
+    def syntax_error
+      reflect.syntax_error
     end
     
     # Returns a Reflector for the accumulated source and caches it.
@@ -41,7 +58,6 @@ module IRB
       def initialize(source)
         super
         @level = 0
-        @syntax_error = false
         parse
       end
       
@@ -53,6 +69,9 @@ module IRB
       #   Reflector.new("class Foo; def foo; end").level # => 1
       #   Reflector.new("class Foo; def foo; end; end").level # => 0
       attr_reader :level
+      
+      # Returns the actual syntax error message if one occurs.
+      attr_reader :syntax_error
       
       # Returns whether or not the source is a valid code block, but does not
       # take syntax errors into account. In short, it's a valid code block if
@@ -80,14 +99,14 @@ module IRB
       #
       #   def foo
       def syntax_error?
-        @syntax_error
+        !@syntax_error.nil?
       end
       
       UNEXPECTED_END = "syntax error, unexpected $end"
       
       def on_parse_error(error) #:nodoc:
         if code_block? || !error.start_with?(UNEXPECTED_END)
-          @syntax_error = true
+          @syntax_error = error
         end
       end
       
