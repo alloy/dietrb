@@ -83,15 +83,29 @@ describe "IRB::Source" do
   end
 end
 
+class Should
+  alias have be
+end
+
 describe "IRB::Source::Reflector" do
   def reflect(source)
     IRB::Source::Reflector.new(source)
   end
   
   it "returns whether or not the source is a valid code block" do
-    reflect("def foo").should.not.be.valid
-    reflect("def foo; p :ok").should.not.be.valid
-    reflect("def foo; p :ok; end").should.be.valid
+    reflect("def foo").should.not.be.code_block
+    reflect("def foo; p :ok").should.not.be.code_block
+    reflect("def foo; p :ok; end").should.be.code_block
+  end
+  
+  it "returns whether or not the source contains a syntax error, except a code block not ending" do
+    reflect("def;").should.have.syntax_error
+    reflect("def;").should.have.syntax_error
+    reflect("def foo").should.not.have.syntax_error
+    reflect("class A; }").should.have.syntax_error
+    reflect("class A; {" ).should.not.have.syntax_error
+    reflect("class A def foo").should.have.syntax_error
+    reflect("class A; def foo" ).should.not.have.syntax_error
   end
   
   it "returns the code block indentation level" do

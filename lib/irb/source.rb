@@ -29,7 +29,7 @@ module IRB
     
     # Reflects on the accumulated source to see if it's a valid code block.
     def valid?
-      reflect.valid?
+      reflect.code_block?
     end
     
     # Returns a Reflector for the accumulated source and caches it.
@@ -41,7 +41,8 @@ module IRB
       def initialize(source)
         super
         @level = 0
-        @valid = !parse.nil?
+        @syntax_error = false
+        @code_block = !parse.nil?
       end
       
       # Returns the code block indentation level.
@@ -63,8 +64,30 @@ module IRB
       # This however is:
       #
       #   def foo; p :ok; end
-      def valid?
-        @valid
+      def code_block?
+        @code_block
+      end
+      
+      # Returns whether or not the source contains a syntax error. However, it
+      # ignores a syntax error resulting in a code block not ending yet.
+      #
+      # For example, this contains a syntax error:
+      #
+      #   def; foo
+      #
+      # This does not:
+      #
+      #   def foo
+      def syntax_error?
+        @syntax_error
+      end
+      
+      UNEXPECTED_END = "syntax error, unexpected $end"
+      
+      def on_parse_error(error) #:nodoc:
+        if code_block? || !error.start_with?(UNEXPECTED_END)
+          @syntax_error = true
+        end
       end
       
       INCREASE_LEVEL_KEYWORDS = %w{ class module def begin if unless case while for do }
