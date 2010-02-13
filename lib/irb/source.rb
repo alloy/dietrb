@@ -37,12 +37,12 @@ module IRB
       @reflection ||= Reflector.new(source)
     end
     
-    class Reflector < Ripper::SexpBuilder
+    class Reflector < Ripper
       def initialize(source)
         super
         @level = 0
         @syntax_error = false
-        @code_block = !parse.nil?
+        parse
       end
       
       # Returns the code block indentation level.
@@ -55,7 +55,8 @@ module IRB
       attr_reader :level
       
       # Returns whether or not the source is a valid code block, but does not
-      # take syntax errors into account.
+      # take syntax errors into account. In short, it's a valid code block if
+      # after parsing the level is at zero.
       #
       # For example, this is not a valid full code block:
       #
@@ -65,7 +66,7 @@ module IRB
       #
       #   def foo; p :ok; end
       def code_block?
-        @code_block
+        @level == 0
       end
       
       # Returns whether or not the source contains a syntax error. However, it

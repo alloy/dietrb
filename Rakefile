@@ -1,4 +1,4 @@
-task :default => :spec
+task :default => :run
 
 desc "Run the specs"
 task :spec do
@@ -8,6 +8,11 @@ end
 desc "Run specs with Kicker"
 task :kick do
   sh "kicker -e 'rake spec' lib spec"
+end
+
+desc "Run dietrb with ruby19"
+task :run do
+  sh "ruby19 -Ilib ./bin/dietrb"
 end
 
 begin
