@@ -52,8 +52,10 @@ end
 
 if defined?(Readline)
   if Readline.respond_to?("basic_word_break_characters=")
-    # IRB adds " and ' to the chars, but that would break string literals for us
-    Readline.basic_word_break_characters= " \t\n`><=;|&{("
+    # IRB adds a few breaking chars. that would break literals for us:
+    # * String: " and '
+    # * Hash: = and >
+    Readline.basic_word_break_characters= " \t\n`<;|&("
   end
   Readline.completion_proc = IRB::Completion
 end

@@ -19,6 +19,7 @@ describe "IRB::Completion" do
   end
 end
 
+
 describe "IRB::Completion, returns all instance methods if the source ends with a period and" do
   extend CompletionHelper
   
