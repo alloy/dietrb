@@ -2,6 +2,10 @@ require 'ripper'
 
 module IRB
   class Completion
+    def self.call(source)
+      new(source).results
+    end
+    
     attr_reader :source
     
     def initialize(source)
@@ -17,7 +21,7 @@ module IRB
       
       # p src, call
       results = Ripper::SexpBuilder.new(src).parse
-      # p results
+      # p @source, results
       
       # [:program, [:stmts_add, [:stmts_new], [x, …]]]
       #                                        ^
@@ -44,4 +48,12 @@ module IRB
       klass.instance_methods.map(&:to_s)
     end
   end
+end
+
+if defined?(Readline)
+  if Readline.respond_to?("basic_word_break_characters=")
+    # IRB adds " and ' to the chars, but that would break string literals for us
+    Readline.basic_word_break_characters= " \t\n`><=;|&{("
+  end
+  Readline.completion_proc = IRB::Completion
 end

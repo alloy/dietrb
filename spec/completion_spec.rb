@@ -11,6 +11,14 @@ module CompletionHelper
   end
 end
 
+describe "IRB::Completion" do
+  extend CompletionHelper
+  
+  it "quacks like a Proc" do
+    IRB::Completion.call('//.').should == imethods(Regexp)
+  end
+end
+
 describe "IRB::Completion, returns all instance methods if the source ends with a period and" do
   extend CompletionHelper
   
