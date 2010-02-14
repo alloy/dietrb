@@ -77,7 +77,7 @@ describe "IRB::Context, when evaluating source" do
   end
   
   it "evaluates code with the object's binding" do
-    @context.evaluate("self").should == main
+    @context.__evaluate__("self").should == main
   end
   
   it "prints the result" do

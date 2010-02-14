@@ -22,8 +22,12 @@ module IRB
       clear_buffer
     end
     
+    def __evaluate__(source)
+      eval(source, @binding)
+    end
+    
     def evaluate(source)
-      result = eval("_ = (#{source})", @binding)
+      result = __evaluate__("_ = (#{source})")
       puts format_result(result)
       result
     rescue Exception => e
