@@ -6,17 +6,56 @@ do the stuff I, and most people I know, actually use.
 Trimming down the core code is done mainly by using Ripper, which comes with
 Ruby 1.9, instead of shipping it's own parser etc.
 
-Furthermore, this IRB version specifically targets MacRuby, for now, and allows
-Cocoa development to be done from the command-line. Dietrb will automatically
-override the normal runloop to be ran in a thread and start a NSRunLoop on the
-main thread.
-
 There's still lots to be done, but the ‘basic functionality’ as is now, should
 not grow too much more. For now my things to-do are .irbrc support, completion,
 and investigate what else people really really need. After that it's time to
 polish.
 
-= Play
+== Differences
+
+* This IRB version specifically targets MacRuby, for now, and allows Cocoa
+  development to be done from the command-line. Dietrb will automatically
+  override the normal runloop to be ran in a thread and start a NSRunLoop on
+  the main thread.
+
+* Dietrb will try to warn about syntax errors as soon as a line is entered and
+  only reset the buffer to the previous line. This means that you don't need to
+  loose any previous work:
+  
+  IRB:
+  
+    irb(main):001:0> class A
+    irb(main):002:1>   def foo
+    irb(main):003:2>     } p :ok
+    irb(main):004:1>   end
+    SyntaxError: compile error
+    (irb):3: syntax error, unexpected '}'
+        } p :ok
+         ^
+    (irb):4: syntax error, unexpected $end, expecting kEND
+    	from (irb):4
+    	from :0
+    irb(main):005:0> A.new.foo
+    NameError: uninitialized constant A
+    	from (irb):5
+    	from :0
+  
+  Dietrb:
+  
+    irb(main):001:0> class A
+    irb(main):002:1>   def foo
+    irb(main):003:2>     } p :ok
+    SyntaxError: compile error
+    (irb):3: syntax error, unexpected '}'
+    irb(main):004:2>     p :ok
+    irb(main):005:2>   end
+    irb(main):006:1> end
+    => nil
+    irb(main):007:0> A.new.foo
+    :ok
+    => :ok
+
+== Play
 
 Normal usage:
 
