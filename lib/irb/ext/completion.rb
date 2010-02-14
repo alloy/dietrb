@@ -7,7 +7,9 @@ module IRB
     #
     # This is meant to be used with Readline which takes a completion proc.
     def self.call(source)
-      new(IRB::Context.current, source).results
+      r = new(IRB::Context.current, source).results
+      # p r
+      r
     end
     
     attr_reader :context, :source
@@ -37,9 +39,9 @@ module IRB
       call = (src[-1,1] == '.')
       src = src[0..-2] if call
       
-      # p src, call
       if tree = Ripper::SexpBuilder.new(src).parse
         # p @source, tree
+        
         # [:program, [:stmts_add, [:stmts_new], [x, …]]]
         #                                        ^
         process_any(tree[1][2])
