@@ -33,7 +33,7 @@ end
 
 class Playground
   CompletionStub = Object.new
-  def CompletionStub.singleton_method; end
+  def CompletionStub.a_singleton_method; end
   
   def a_local_method; end
 end
@@ -173,5 +173,25 @@ describe "IRB::Completion, when the source ends with a period, " do
       complete('+100_000_000_000_000_000_000.0.').should == imethods(Float)
       complete('-100_000_000_000_000_000_000.0.').should == imethods(Float)
     end
+  end
+end
+
+describe "IRB::Completion, when the source does not end with a period" do
+  extend CompletionHelper
+  
+  before do
+    @context = IRB::Context.new(Playground.new)
+  end
+  
+  it "filters the methods of a literal by the called method name" do
+    complete('//.nam').should == %w{ names named_captures }
+    complete('//.named').should == %w{ named_captures }
+  end
+  
+  it "filters the methods of an object, reference by variable, by the called method name" do
+    @context.__evaluate__('foo = ::CompletionStub.new')
+    complete('foo.an_im').should == %w{ an_imethod }
+    complete('CompletionStub.a_sing').should == %w{ a_singleton_method }
+    complete('$a_completion_stub.an_im').should == %w{ an_imethod }
   end
 end

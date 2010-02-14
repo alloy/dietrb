@@ -38,19 +38,20 @@ module IRB
       src = src[0..-2] if call
       
       # p src, call
-      tree = Ripper::SexpBuilder.new(src).parse
-      # p @source, tree
-      
-      # [:program, [:stmts_add, [:stmts_new], [x, …]]]
-      #                                        ^
-      process_any(tree[1][2])
+      if tree = Ripper::SexpBuilder.new(src).parse
+        # p @source, tree
+        # [:program, [:stmts_add, [:stmts_new], [x, …]]]
+        #                                        ^
+        process_any(tree[1][2])
+      end
     end
     
     def process_any(tree)
       result = case tree[0]
-      # [:program, [:stmts_add, [:stmts_new], [:unary, :-@, [x, …]]]]
-      #                                                     ^
+      # [:unary, :-@, [x, …]]
+      #               ^
       when :unary                          then process_any(tree[2])
+      when :call                           then process_filter(tree)
       when :var_ref, :top_const_ref        then process_variable(tree)
       when :array, :words_add, :qwords_add then Array
       when :@int                           then Fixnum
@@ -66,6 +67,14 @@ module IRB
       if result
         result = result.instance_methods if result.is_a?(Class)
         result.map(&:to_s)
+      end
+    end
+    
+    def process_filter(tree)
+      # [:call, [:hash, nil], :".", [:@ident, x, …]]
+      #                                       ^
+      if list = process_any(tree[1])
+        list.grep(/^#{tree[3][1]}/)
       end
     end
     
