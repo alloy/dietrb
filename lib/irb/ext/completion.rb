@@ -75,8 +75,10 @@ module IRB
     def process_filter(tree)
       # [:call, [:hash, nil], :".", [:@ident, x, …]]
       #                                       ^
+      filter = tree[3][1]
+      x = @source[0..-(filter.length + 2)]
       if list = process_any(tree[1])
-        list.grep(/^#{tree[3][1]}/)
+        list.grep(/^#{filter}/).map { |m| "#{x}.#{m}" }
       end
     end
     
