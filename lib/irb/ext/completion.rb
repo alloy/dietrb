@@ -2,6 +2,11 @@ require 'ripper'
 
 module IRB
   class Completion
+    # Convenience constants for sexp access of Ripper::SexpBuilder.
+    TYPE   = 0
+    VALUE  = 1
+    CALLEE = 3
+    
     # Returns an array of possible completion results, with the current
     # IRB::Context.
     #
@@ -45,38 +50,34 @@ module IRB
       if sexp = Ripper::SexpBuilder.new(source).parse
         # [:program, [:stmts_add, [:stmts_new], [x, …]]]
         #                                        ^
-        sexp = sexp[1][2]
+        root = sexp[1][2]
         
         # [:call, [:hash, nil], :".", [:@ident, x, …]]
-        if sexp[0] == :call
+        if root[TYPE] == :call
           call     = true
-          filter   = sexp[3][1]
+          filter   = root[CALLEE][VALUE]
           receiver = source[0..-(filter.length + 2)]
-          sexp     = sexp[1]
+          root     = root[VALUE]
         end
         
         if call
-          methods = methods_of_object(sexp)
-          format(receiver, methods, filter)
+          format_methods(receiver, methods_of_object(root), filter)
         else
-          match_methods_vars_or_consts_in_scope(sexp)
+          match_methods_vars_or_consts_in_scope(root)
         end.sort
       end
     end
     
-    def format(receiver, methods, filter)
-      (filter ? methods.grep(/^#{filter}/) : methods).map { |m| "#{receiver}.#{m}" }
-    end
-    
-    def match_methods_vars_or_consts_in_scope(sexp)
-      filter = sexp[1][1]
-      case sexp[1][0]
+    def match_methods_vars_or_consts_in_scope(symbol)
+      var    = symbol[VALUE]
+      filter = var[VALUE]
+      case var[TYPE]
       when :@ident
         local_variables + instance_methods
       when :@gvar
         global_variables.map(&:to_s)
       when :@const
-        if sexp[0] == :top_const_ref
+        if symbol[TYPE] == :top_const_ref
           filter = "::#{filter}"
           Object.constants.map { |c| "::#{c}" }
         else
@@ -85,12 +86,16 @@ module IRB
       end.grep(/^#{Regexp.quote(filter)}/)
     end
     
-    def methods_of_object(sexp)
-      result = case sexp[0]
+    def format_methods(receiver, methods, filter)
+      (filter ? methods.grep(/^#{filter}/) : methods).map { |m| "#{receiver}.#{m}" }
+    end
+    
+    def methods_of_object(root)
+      result = case root[TYPE]
       # [:unary, :-@, [x, …]]
       #               ^
-      when :unary                          then return methods_of_object(sexp[2]) # TODO: do we really need this?
-      when :var_ref, :top_const_ref        then return methods_of_object_in_variable(sexp)
+      when :unary                          then return methods_of_object(root[2]) # TODO: do we really need this?
+      when :var_ref, :top_const_ref        then return methods_of_object_in_variable(root)
       when :array, :words_add, :qwords_add then Array
       when :@int                           then Fixnum
       when :@float                         then Float
@@ -103,15 +108,15 @@ module IRB
       end.instance_methods
     end
     
-    def methods_of_object_in_variable(sexp)
-      type, name = sexp[1][0..1]
+    def methods_of_object_in_variable(var)
+      subtype, name = var[VALUE][0..1]
       
-      if sexp[0] == :top_const_ref
-        if type == :@const && Object.constants.include?(name.to_sym)
+      if var[TYPE] == :top_const_ref
+        if subtype == :@const && Object.constants.include?(name.to_sym)
           evaluate("::#{name}").methods
         end
       else
-        case type
+        case subtype
         when :@ident
           evaluate(name).methods if local_variables.include?(name)
         when :@gvar
