@@ -108,15 +108,15 @@ module IRB
       end.instance_methods
     end
     
-    def methods_of_object_in_variable(var)
-      subtype, name = var[VALUE][0..1]
+    def methods_of_object_in_variable(path)
+      type, name = path[VALUE][0..1]
       
-      if var[TYPE] == :top_const_ref
-        if subtype == :@const && Object.constants.include?(name.to_sym)
+      if path[TYPE] == :top_const_ref
+        if type == :@const && Object.constants.include?(name.to_sym)
           evaluate("::#{name}").methods
         end
       else
-        case subtype
+        case type
         when :@ident
           evaluate(name).methods if local_variables.include?(name)
         when :@gvar
