@@ -24,10 +24,14 @@ module IRB
       evaluate('local_variables').map(&:to_s)
     end
     
+    def instance_methods
+      @context.object.methods.map(&:to_s)
+    end
+    
     # TODO: test and or fix the fact that we need to get constants from the
     # singleton class.
     def constants
-      evaluate('self.class.constants + (class << self; constants; end)').map(&:to_s)
+      evaluate('Object.constants + self.class.constants + (class << self; constants; end)').map(&:to_s)
     end
     
     def results
@@ -54,12 +58,31 @@ module IRB
         if call
           methods = methods_of_object(sexp)
           format(receiver, methods, filter)
-        end
+        else
+          match_methods_vars_or_consts_in_scope(sexp)
+        end.sort
       end
     end
     
     def format(receiver, methods, filter)
       (filter ? methods.grep(/^#{filter}/) : methods).map { |m| "#{receiver}.#{m}" }
+    end
+    
+    def match_methods_vars_or_consts_in_scope(sexp)
+      filter = sexp[1][1]
+      case sexp[1][0]
+      when :@ident
+        local_variables + instance_methods
+      when :@gvar
+        global_variables.map(&:to_s)
+      when :@const
+        if sexp[0] == :top_const_ref
+          filter = "::#{filter}"
+          Object.constants.map { |c| "::#{c}" }
+        else
+          constants
+        end
+      end.grep(/^#{Regexp.quote(filter)}/)
     end
     
     def methods_of_object(sexp)
