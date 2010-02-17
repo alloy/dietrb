@@ -7,9 +7,7 @@ module IRB
     #
     # This is meant to be used with Readline which takes a completion proc.
     def self.call(source)
-      r = new(IRB::Context.current, source).results
-      # p r
-      r
+      new(IRB::Context.current, source).results
     end
     
     attr_reader :context, :source
@@ -33,28 +31,43 @@ module IRB
     end
     
     def results
-      src = @source
+      source = @source
+      filter = nil
       
       # if ends with period, remove it to remove the syntax error it causes
-      call = (src[-1,1] == '.')
-      src = src[0..-2] if call
+      call = (source[-1,1] == '.')
+      receiver = source = source[0..-2] if call
       
-      if tree = Ripper::SexpBuilder.new(src).parse
-        # p @source, tree
-        
+      if sexp = Ripper::SexpBuilder.new(source).parse
         # [:program, [:stmts_add, [:stmts_new], [x, …]]]
         #                                        ^
-        process_any(tree[1][2])
+        sexp = sexp[1][2]
+        
+        # [:call, [:hash, nil], :".", [:@ident, x, …]]
+        if sexp[0] == :call
+          call     = true
+          filter   = sexp[3][1]
+          receiver = source[0..-(filter.length + 2)]
+          sexp     = sexp[1]
+        end
+        
+        if call
+          methods = methods_of_object(sexp)
+          format(receiver, methods, filter)
+        end
       end
     end
     
-    def process_any(tree)
-      result = case tree[0]
+    def format(receiver, methods, filter)
+      (filter ? methods.grep(/^#{filter}/) : methods).map { |m| "#{receiver}.#{m}" }
+    end
+    
+    def methods_of_object(sexp)
+      result = case sexp[0]
       # [:unary, :-@, [x, …]]
       #               ^
-      when :unary                          then process_any(tree[2])
-      when :call                           then process_filter(tree)
-      when :var_ref, :top_const_ref        then process_variable(tree)
+      when :unary                          then return methods_of_object(sexp[2]) # TODO: do we really need this?
+      when :var_ref, :top_const_ref        then return methods_of_object_in_variable(sexp)
       when :array, :words_add, :qwords_add then Array
       when :@int                           then Fixnum
       when :@float                         then Float
@@ -64,28 +77,13 @@ module IRB
       when :regexp_literal                 then Regexp
       when :string_literal                 then String
       when :symbol_literal, :dyna_symbol   then Symbol
-      end
-      
-      if result
-        result = result.instance_methods if result.is_a?(Class)
-        result.map(&:to_s)
-      end
+      end.instance_methods
     end
     
-    def process_filter(tree)
-      # [:call, [:hash, nil], :".", [:@ident, x, …]]
-      #                                       ^
-      filter = tree[3][1]
-      x = @source[0..-(filter.length + 2)]
-      if list = process_any(tree[1])
-        list.grep(/^#{filter}/).map { |m| "#{x}.#{m}" }
-      end
-    end
-    
-    def process_variable(tree)
-      type, name = tree[1][0..1]
+    def methods_of_object_in_variable(sexp)
+      type, name = sexp[1][0..1]
       
-      if tree[0] == :top_const_ref
+      if sexp[0] == :top_const_ref
         if type == :@const && Object.constants.include?(name.to_sym)
           evaluate("::#{name}").methods
         end
