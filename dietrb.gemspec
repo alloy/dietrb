@@ -5,29 +5,33 @@
 
 Gem::Specification.new do |s|
   s.name = %q{dietrb}
-  s.version = "0.1.2"
+  s.version = "0.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Eloy Duran"]
-  s.date = %q{2010-02-07}
+  s.date = %q{2010-02-18}
   s.default_executable = %q{dietrb}
   s.description = %q{IRB on a diet, for MacRuby / Ruby 1.9}
   s.email = %q{eloy.de.enige@gmail.com}
   s.executables = ["dietrb"]
   s.extra_rdoc_files = [
-    "README"
+    "LICENSE",
+     "README.rdoc"
   ]
   s.files = [
     ".gitignore",
-     "README",
+     "LICENSE",
+     "README.rdoc",
      "Rakefile",
      "VERSION",
      "bin/dietrb",
      "dietrb.gemspec",
      "lib/irb.rb",
      "lib/irb/context.rb",
+     "lib/irb/ext/completion.rb",
      "lib/irb/ext/macruby.rb",
      "lib/irb/source.rb",
+     "spec/completion_spec.rb",
      "spec/context_spec.rb",
      "spec/irb_spec.rb",
      "spec/source_spec.rb",
@@ -40,7 +44,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.5}
   s.summary = %q{IRB on a diet, for MacRuby / Ruby 1.9}
   s.test_files = [
-    "spec/context_spec.rb",
+    "spec/completion_spec.rb",
+     "spec/context_spec.rb",
      "spec/irb_spec.rb",
      "spec/source_spec.rb",
      "spec/spec_helper.rb"
