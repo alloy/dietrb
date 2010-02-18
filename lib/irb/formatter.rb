@@ -1,5 +1,7 @@
 module IRB
   class << self
+    attr_writer :formatter
+    
     def formatter
       @formatter ||= Formatter::Default.new
     end
@@ -25,6 +27,14 @@ module IRB
       
       def syntax_error(line, message)
         SYNTAX_ERROR % [line, message]
+      end
+    end
+    
+    class SimplePrompt < Default
+      PROMPT = ">> "
+      
+      def prompt(_)
+        PROMPT
       end
     end
   end

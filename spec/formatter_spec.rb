@@ -36,3 +36,13 @@ describe "IRB::Formatter::Default" do
       "SyntaxError: compile error\n(irb):2: syntax error, unexpected '}'"
   end
 end
+
+describe "IRB::Formatter::SimplePrompt" do
+  before do
+    @formatter = IRB::Formatter::SimplePrompt.new
+  end
+  
+  it "returns a very simple prompt" do
+    @formatter.prompt(nil).should == ">> "
+  end
+end
