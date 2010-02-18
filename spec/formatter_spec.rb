@@ -2,9 +2,9 @@ require File.expand_path('../spec_helper', __FILE__)
 
 main = self
 
-describe "IRB::Formatter::Default" do
+describe "IRB::Formatter" do
   before do
-    @formatter = IRB::Formatter::Default.new
+    @formatter = IRB::Formatter.new
     @context = IRB::Context.new(main)
   end
   
@@ -21,6 +21,16 @@ describe "IRB::Formatter::Default" do
     @formatter.prompt(IRB::Context.new(o)).should == "irb(#{o.inspect}):001:0> "
   end
   
+  it "returns a very simple prompt if specified" do
+    @formatter.prompt = :simple
+    @formatter.prompt(@context).should == ">> "
+  end
+  
+  it "returns no prompt if specified" do
+    @formatter.prompt = nil
+    @formatter.prompt(@context).should == ""
+  end
+  
   it "returns a formatted exception message" do
     begin; DoesNotExist; rescue NameError => e; exception = e; end
     @formatter.exception(exception).should ==
@@ -34,15 +44,5 @@ describe "IRB::Formatter::Default" do
   it "prints that a syntax error occurred on the last line and reset the buffer to the previous line" do
     @formatter.syntax_error(2, "syntax error, unexpected '}'").should ==
       "SyntaxError: compile error\n(irb):2: syntax error, unexpected '}'"
-  end
-end
-
-describe "IRB::Formatter::SimplePrompt" do
-  before do
-    @formatter = IRB::Formatter::SimplePrompt.new
-  end
-  
-  it "returns a very simple prompt" do
-    @formatter.prompt(nil).should == ">> "
   end
 end
