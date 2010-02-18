@@ -7,8 +7,8 @@ end
 
 module Kernel
   # Creates a new IRB::Context with the given +object+ and runs it.
-  def irb(object)
-    IRB::Context.new(object).run
+  def irb(object, binding = nil)
+    IRB::Context.new(object, binding).run
   end
   
   private :irb
