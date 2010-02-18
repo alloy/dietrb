@@ -45,26 +45,6 @@ describe "IRB::Context" do
     lambda { eval("x", @context.binding) }.should.raise NameError
   end
   
-  it "returns a prompt string, displaying line number and code indentation level" do
-    @context.prompt.should == "irb(main):001:0> "
-    @context.instance_variable_set(:@line, 23)
-    @context.prompt.should == "irb(main):023:0> "
-    @context.source << "def foo"
-    @context.prompt.should == "irb(main):023:1> "
-  end
-  
-  it "describes the context's object in the prompt" do
-    @context.prompt.should == "irb(main):001:0> "
-    o = Object.new
-    IRB::Context.new(o).prompt.should == "irb(#{o.inspect}):001:0> "
-  end
-  
-  it "returns a formatted exception message" do
-    begin; DoesNotExist; rescue NameError => e; exception = e; end
-    @context.format_exception(exception).should ==
-      "NameError: uninitialized constant Bacon::Context::DoesNotExist\n\t#{exception.backtrace.join("\n\t")}"
-  end
-  
   it "makes itself the current running context during the runloop and resigns once it's done" do
     IRB::Context.current.should == nil
     

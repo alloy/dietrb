@@ -1,3 +1,4 @@
+require 'irb/formatter'
 require 'readline'
 
 module IRB
@@ -28,14 +29,14 @@ module IRB
     
     def evaluate(source)
       result = __evaluate__("_ = (#{source})")
-      puts format_result(result)
+      puts formatter.result(result)
       result
     rescue Exception => e
-      puts format_exception(e)
+      puts formatter.exception(e)
     end
     
     def readline
-      Readline.readline(prompt, true)
+      Readline.readline(formatter.prompt(self), true)
     end
     
     def run
@@ -64,7 +65,7 @@ module IRB
       return false if @source.to_s == "quit"
       
       if @source.syntax_error?
-        puts format_syntax_error(@source.syntax_error)
+        puts formatter.syntax_error(@line, @source.syntax_error)
         @source.pop
       elsif @source.code_block?
         evaluate(@source)
@@ -75,25 +76,11 @@ module IRB
       true
     end
     
-    PROMPT = "irb(%s):%03d:%d> "
-    
-    def prompt
-      PROMPT % [@object.inspect, @line, @source.level]
-    end
-    
-    def format_result(result)
-      "=> #{result.inspect}"
-    end
-    
-    def format_exception(e)
-      "#{e.class.name}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
-    end
-    
-    def format_syntax_error(e)
-      "SyntaxError: compile error\n(irb):#{@line}: #{e}"
-    end
-    
     private
+    
+    def formatter
+      IRB.formatter
+    end
     
     def clear_buffer
       @source = Source.new
