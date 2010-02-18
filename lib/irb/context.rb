@@ -15,9 +15,9 @@ module IRB
     
     attr_reader :object, :binding, :line, :source
     
-    def initialize(object)
+    def initialize(object, explicit_binding = nil)
       @object  = object
-      @binding = object.instance_eval { binding }
+      @binding = explicit_binding || object.instance_eval { binding }
       @line    = 1
       clear_buffer
     end

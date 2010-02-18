@@ -29,6 +29,12 @@ describe "IRB::Context" do
     eval("y", @context.binding).should == :ok
   end
   
+  it "initializes with an object and an explicit binding" do
+    context = IRB::Context.new(Object.new, TOPLEVEL_BINDING)
+    eval("class InTopLevel; end", context.binding)
+    lambda { ::InTopLevel }.should.not.raise NameError
+  end
+  
   it "initializes with an 'empty' state" do
     @context.line.should == 1
     @context.source.should.be.instance_of IRB::Source
@@ -108,7 +114,7 @@ describe "IRB::Context, when evaluating source" do
   it "prints the exception that occurs" do
     @context.evaluate("DoesNotExist")
     printed = @context.instance_variable_get(:@printed)
-    printed.should.match /^NameError: uninitialized constant DoesNotExist/
+    printed.should.match /^NameError:.+DoesNotExist/
   end
 end
 

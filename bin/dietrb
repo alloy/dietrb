@@ -1,4 +1,4 @@
 #!/usr/bin/env ruby
 
 require 'irb'
-irb(self)
+irb(self, TOPLEVEL_BINDING)
