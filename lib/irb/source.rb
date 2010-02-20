@@ -10,8 +10,11 @@ module IRB
     
     # Adds a source line to the buffer and flushes the cached reflection.
     def <<(source)
-      @reflection = nil
-      @buffer << source.chomp
+      source = source.strip
+      unless source.empty?
+        @reflection = nil
+        @buffer << source
+      end
     end
     
     # Removes the last line from the buffer and flushes the cached reflection.

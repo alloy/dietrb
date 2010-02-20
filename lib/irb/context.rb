@@ -37,6 +37,9 @@ module IRB
     
     def readline
       Readline.readline(formatter.prompt(self), true)
+    rescue Interrupt
+      clear_buffer
+      ""
     end
     
     def run

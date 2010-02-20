@@ -19,6 +19,12 @@ describe "IRB::Source" do
     @source.buffer.should == %w{ foo bar }
   end
   
+  it "ignores empty strings" do
+    @source << ""
+    @source << " \n"
+    @source.buffer.should == []
+  end
+  
   it "removes the last line from the buffer" do
     @source << "foo\n"
     @source << "bar\r\n"

@@ -1,18 +1,21 @@
 require File.expand_path('../spec_helper', __FILE__)
 require 'tempfile'
 
-class << Readline
-  attr_reader :received
-  
-  def stub_input(*input)
-    @input = input
-  end
-  
-  def readline(prompt, history)
-    @received = [prompt, history]
-    @input.shift
+def stub_Readline
+  class << Readline
+    attr_reader :received
+    
+    def stub_input(*input)
+      @input = input
+    end
+    
+    def readline(prompt, history)
+      @received = [prompt, history]
+      @input.shift
+    end
   end
 end
+stub_Readline
 
 main = self
 
@@ -120,6 +123,24 @@ describe "IRB::Context, when receiving input" do
     @context.process_line("def foo")
     @context.process_line("p :ok")
     @context.source.to_s.should == "def foo\np :ok"
+  end
+  
+  it "clears the source buffer when an Interrupt signal is received" do
+    begin
+      @context.process_line("def foo")
+      
+      def Readline.readline(*args)
+        def Readline.readline(*args)
+          nil
+        end
+        raise Interrupt
+      end
+      
+      lambda { @context.run }.should.not.raise Interrupt
+      @context.source.to_s.should == ""
+    ensure
+      stub_Readline
+    end
   end
   
   it "increases the current line number" do
