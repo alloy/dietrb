@@ -218,4 +218,11 @@ describe "IRB::Completion" do
       complete("::CompletionSt").should == %w{ ::CompletionStub }
     end
   end
+  
+  it "completes reserved words as variables or constants" do
+    (IRB::Completion::RESERVED_DOWNCASE_WORDS +
+      IRB::Completion::RESERVED_UPCASE_WORDS).each do |word|
+      complete(word[0..-2]).should.include word
+    end
+  end
 end

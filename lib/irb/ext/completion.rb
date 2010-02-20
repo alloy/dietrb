@@ -7,6 +7,29 @@ module IRB
     VALUE  = 1
     CALLEE = 3
     
+    RESERVED_UPCASE_WORDS = %w{
+      BEGIN  END
+    }
+    
+    RESERVED_DOWNCASE_WORDS = %w{
+      alias  and
+      begin  break
+      case   class
+      def    defined do
+      else   elsif   end   ensure
+      false  for
+      if     in
+      module
+      next   nil     not
+      or
+      redo   rescue  retry return
+      self   super
+      then   true
+      undef  unless  until
+      when   while
+      yield
+    }
+    
     # Returns an array of possible completion results, with the current
     # IRB::Context.
     #
@@ -64,7 +87,7 @@ module IRB
           format_methods(receiver, methods_of_object(root), filter)
         else
           match_methods_vars_or_consts_in_scope(root)
-        end.sort
+        end.sort.uniq
       end
     end
     
@@ -73,7 +96,7 @@ module IRB
       filter = var[VALUE]
       case var[TYPE]
       when :@ident
-        local_variables + instance_methods
+        local_variables + instance_methods + RESERVED_DOWNCASE_WORDS
       when :@gvar
         global_variables.map(&:to_s)
       when :@const
@@ -81,7 +104,7 @@ module IRB
           filter = "::#{filter}"
           Object.constants.map { |c| "::#{c}" }
         else
-          constants
+          constants + RESERVED_UPCASE_WORDS
         end
       end.grep(/^#{Regexp.quote(filter)}/)
     end

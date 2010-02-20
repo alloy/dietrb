@@ -12,7 +12,7 @@ end
 
 desc "Run dietrb with ruby19"
 task :run do
-  sh "ruby19 -Ilib ./bin/dietrb"
+  sh "ruby19 -Ilib ./bin/dietrb -r irb/ext/completion"
 end
 
 begin
