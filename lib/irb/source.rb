@@ -54,11 +54,11 @@ module IRB
       @reflection ||= Reflector.new(source)
     end
     
-    class Reflector < Ripper
+    class Reflector < Ripper::SexpBuilder
       def initialize(source)
         super
         @level = 0
-        parse
+        @code_block = !parse.nil?
       end
       
       # Returns the code block indentation level.
@@ -85,7 +85,7 @@ module IRB
       #
       #   def foo; p :ok; end
       def code_block?
-        @level == 0
+        @code_block
       end
       
       # Returns whether or not the source contains a syntax error. However, it

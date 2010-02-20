@@ -120,6 +120,9 @@ describe "IRB::Source::Reflector" do
     reflect("def foo").should.not.be.code_block
     reflect("def foo; p :ok").should.not.be.code_block
     reflect("def foo; p :ok; end").should.be.code_block
+    
+    reflect("if true").should.not.be.code_block
+    reflect("p :ok if true").should.be.code_block
   end
   
   it "returns whether or not the source contains a syntax error, except a code block not ending" do
