@@ -130,10 +130,10 @@ describe "IRB::Context, when receiving input" do
       @context.process_line("def foo")
       
       def Readline.readline(*args)
-        def Readline.readline(*args)
-          nil
+        unless @raised
+          @raised = true
+          raise Interrupt
         end
-        raise Interrupt
       end
       
       lambda { @context.run }.should.not.raise Interrupt
