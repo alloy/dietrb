@@ -7,13 +7,15 @@ module IRB
     DEFAULT_PROMPT = "irb(%s):%03d:%d> "
     SIMPLE_PROMPT  = ">> "
     NO_PROMPT      = ""
-    
-    SYNTAX_ERROR = "SyntaxError: compile error\n(irb):%d: %s"
+    SYNTAX_ERROR   = "SyntaxError: compile error\n(irb):%d: %s"
+    SOURCE_ROOT    = /^#{File.expand_path('../../../', __FILE__)}/
     
     attr_writer :prompt
+    attr_reader :filter_from_backtrace
     
     def initialize
       @prompt = :default
+      @filter_from_backtrace = [SOURCE_ROOT]
     end
     
     def prompt(context)
@@ -25,16 +27,23 @@ module IRB
       end
     end
     
-    def exception(exception)
-      "#{exception.class.name}: #{exception.message}\n\t#{exception.backtrace.join("\n\t")}"
-    end
-    
     def result(object)
       "=> #{object.inspect}"
     end
     
     def syntax_error(line, message)
       SYNTAX_ERROR % [line, message]
+    end
+    
+    def exception(exception)
+      backtrace = $DEBUG ? exception.backtrace : filter_backtrace(exception.backtrace)
+      "#{exception.class.name}: #{exception.message}\n\t#{backtrace.join("\n\t")}"
+    end
+    
+    def filter_backtrace(backtrace)
+      backtrace.reject do |line|
+        @filter_from_backtrace.any? { |pattern| pattern.match(line) }
+      end
     end
   end
 end

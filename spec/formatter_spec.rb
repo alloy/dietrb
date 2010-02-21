@@ -31,10 +31,23 @@ describe "IRB::Formatter" do
     @formatter.prompt(@context).should == ""
   end
   
-  it "returns a formatted exception message" do
-    begin; DoesNotExist; rescue NameError => e; exception = e; end
+  it "returns a formatted exception message, with the lines, regarding dietrb, filtered out of the backtrace" do
+    begin; @context.__evaluate__('DoesNotExist'); rescue NameError => e; exception = e; end
+    backtrace = exception.backtrace.reject { |f| f =~ /#{ROOT}/ }
     @formatter.exception(exception).should ==
-      "NameError: uninitialized constant Bacon::Context::DoesNotExist\n\t#{exception.backtrace.join("\n\t")}"
+      "NameError: uninitialized constant IRB::Context::DoesNotExist\n\t#{backtrace.join("\n\t")}"
+  end
+  
+  it "does not filter the backtrace if $DEBUG is true" do
+    begin
+      before, $DEBUG = $DEBUG, true
+      
+      begin; @context.__evaluate__('DoesNotExist'); rescue NameError => e; exception = e; end
+      @formatter.exception(exception).should ==
+        "NameError: uninitialized constant IRB::Context::DoesNotExist\n\t#{exception.backtrace.join("\n\t")}"
+    ensure
+      $DEBUG = before
+    end
   end
   
   it "prints the result" do
