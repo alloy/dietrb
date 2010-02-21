@@ -180,6 +180,7 @@ describe "IRB::Source::Reflector" do
     [
       ["lambda { |x|", "}"],
       ["{", "}"],
+      ['"#{', '}"'],
       ["[", "]"]
     ].each do |open, close|
       reflect(open).level.should == 1

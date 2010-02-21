@@ -135,6 +135,11 @@ module IRB
         super
       end
       
+      def on_embexpr_beg(token) #:nodoc:
+        @level += 1
+        super
+      end
+      
       def on_lbrace(token) #:nodoc:
         @level += 1
         super
