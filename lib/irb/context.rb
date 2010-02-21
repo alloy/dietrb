@@ -23,12 +23,12 @@ module IRB
       clear_buffer
     end
     
-    def __evaluate__(source)
-      eval(source, @binding)
+    def __evaluate__(source, file = __FILE__, line = __LINE__)
+      eval(source, @binding, file, line)
     end
     
     def evaluate(source)
-      result = __evaluate__("_ = (#{source})")
+      result = __evaluate__("_ = (#{source})", '(irb)', @line - @source.buffer.size + 1)
       puts formatter.result(result)
       result
     rescue Exception => e

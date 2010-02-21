@@ -63,6 +63,7 @@ describe "IRB::Context, when evaluating source" do
   before do
     @context = IRB::Context.new(main)
     def @context.puts(string); @printed = string; end
+    def @context.printed;      @printed;          end
   end
   
   it "evaluates code with the object's binding" do
@@ -96,8 +97,16 @@ describe "IRB::Context, when evaluating source" do
   
   it "prints the exception that occurs" do
     @context.evaluate("DoesNotExist")
-    printed = @context.instance_variable_get(:@printed)
-    printed.should.match /^NameError:.+DoesNotExist/
+    @context.printed.should.match /^NameError:.+DoesNotExist/
+  end
+  
+  it "uses the line number of the *first* line in the buffer, for the line parameter of eval" do
+    @context.process_line("DoesNotExist")
+    @context.printed.should.match /\(irb\):1:in/
+    @context.process_line("class A")
+    @context.process_line("DoesNotExist")
+    @context.process_line("end")
+    @context.printed.should.match /\(irb\):3:in.+\(irb\):2:in/m
   end
 end
 
