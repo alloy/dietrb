@@ -21,4 +21,16 @@ unless ARGV.empty?
 end
 
 IRB.formatter.filter_from_backtrace << /^#{__FILE__}/
-irb(self, TOPLEVEL_BINDING)
+
+if ARGV.empty?
+  irb(self, TOPLEVEL_BINDING.dup)
+else
+  path = ARGV.shift
+  context = IRB::Context.new(self, TOPLEVEL_BINDING.dup)
+  File.open(path, 'r') do |file|
+    file.each_line do |line|
+      puts IRB.formatter.prompt(context) + line
+      context.process_line(line)
+    end
+  end
+end
