@@ -56,6 +56,10 @@ module IRB
       @context.object.methods.map(&:to_s)
     end
     
+    def instance_methods_of(klass)
+      evaluate(klass).instance_methods
+    end
+    
     # TODO: test and or fix the fact that we need to get constants from the
     # singleton class.
     def constants
@@ -77,18 +81,39 @@ module IRB
         
         # [:call, [:hash, nil], :".", [:@ident, x, …]]
         if root[TYPE] == :call
-          call     = true
-          filter   = root[CALLEE][VALUE]
-          receiver = source[0..-(filter.length + 2)]
-          root     = root[VALUE]
+          call  = true
+          stack = unwind_callstack(root)
+          # [[:var_ref, [:@const, "Klass", [1, 0]]], [:call, "new"]]
+          # [[:var_ref, [:@ident, "klass", [1, 0]]], [:call, "new"], [:call, "filter"]]
+          if stack[1][VALUE] == 'new'
+            klass    = stack[0][VALUE][VALUE]
+            filter   = stack[2][VALUE] if stack[2]
+            receiver = "#{klass}.new"
+            methods  = instance_methods_of(klass)
+          else
+            filter   = root[CALLEE][VALUE]
+            filter   = stack[1][VALUE]
+            receiver = source[0..-(filter.length + 2)]
+            root     = root[VALUE]
+          end
         end
         
         if call
-          format_methods(receiver, methods_of_object(root), filter)
+          format_methods(receiver, methods || methods_of_object(root), filter)
         else
           match_methods_vars_or_consts_in_scope(root)
         end.sort.uniq
       end
+    end
+    
+    def unwind_callstack(root, stack = [])
+      if root[TYPE] == :call
+        stack.unshift [:call, root[CALLEE][VALUE]]
+        unwind_callstack(root[VALUE], stack)
+      else
+        stack.unshift root
+      end
+      stack
     end
     
     def match_methods_vars_or_consts_in_scope(symbol)

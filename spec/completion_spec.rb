@@ -171,6 +171,15 @@ describe "IRB::Completion" do
           complete('-100_000_000_000_000_000_000.0.').should == imethods(Float, '-100_000_000_000_000_000_000.0')
         end
       end
+      
+      it "returns *all* public instance methods of the class (the receiver) that ::new is called on" do
+        complete("Playground.new.").should == imethods(Playground, 'Playground.new')
+        complete("Playground.new.a_local_m").should == %w{ Playground.new.a_local_method }
+        
+        @context.__evaluate__("klass = Playground")
+        complete("klass.new.").should == imethods(Playground, 'klass.new')
+        complete("klass.new.a_local_m").should == %w{ klass.new.a_local_method }
+      end
     end
     
     describe "and the source does *not* end with a period," do
