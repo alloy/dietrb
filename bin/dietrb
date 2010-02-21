@@ -20,4 +20,5 @@ unless ARGV.empty?
   end.parse!(ARGV)
 end
 
+IRB.formatter.filter_from_backtrace << /^#{__FILE__}/
 irb(self, TOPLEVEL_BINDING)
