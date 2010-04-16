@@ -11,6 +11,33 @@ not grow too much more. For now my things to-do are .irbrc support, completion,
 and investigate what else people really really need. After that it's time to
 polish.
 
+== IRB Extensions people use:
+
+* cypher: irb_rocket, utility_belt, hirb, and awesome_print.
+  I also occasionally use sketches, but I wouldn't really miss it if I didn't have it.
+
+* iain_nl: Wirble, AwesomePrint, Hirb. My irbrc: http://gist.github.com/368237
+
+* svoop: Looksee, Wirble, Hirb and copy&paste support.
+
+* irbaddict: is use Ben Bleything's irb history hack see lighting talks rubyconf 2006
+
+* logankoester: You can find my irbrc over at github if you want to take a look. (http://github.com/logankoester/irbrc)
+  I've modified my IRB quite extensively: 
+  map_by_method 
+  what_methods 
+  prettyprint (pp) 
+  awesome_print 
+  net-http-spy 
+  the usual simple prompt, tab completion, auto indent 
+  wirble 
+  "clear" method to clear the screen 
+  fast load/reload shortcuts 
+  sketches 
+
+* trans: Wirble and of course irb/completion and history.
+  I try not to get too crazy about it b/c the more extensions you have the less you have a true Ruby slate to work with. Hmm.. which makes me think a command-line option to turn off most of it would be cool. Perhaps even two or three levels.
+
 == Differences
 
 * This IRB version specifically targets MacRuby, for now, and allows Cocoa
