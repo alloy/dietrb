@@ -197,3 +197,12 @@ describe "IRB::Context, when receiving input" do
     @context.instance_variable_get(:@received).should.not == "def foo"
   end
 end
+
+describe "Kernel::irb" do
+  it "creates a new context for the given object and runs it" do
+    Readline.stub_input("::IRBRan = self")
+    o = Object.new
+    irb(o)
+    IRBRan.should == o
+  end
+end
