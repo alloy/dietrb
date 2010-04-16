@@ -2,7 +2,8 @@ task :default => :run
 
 desc "Run the specs"
 task :spec do
-  sh "macbacon #{FileList['spec/**/*_spec.rb'].join(' ')}"
+  # sh "macbacon #{FileList['spec/**/*_spec.rb'].join(' ')}"
+  sh "bacon19 #{FileList['spec/**/*_spec.rb'].join(' ')}"
 end
 
 desc "Run specs with Kicker"

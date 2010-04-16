@@ -20,6 +20,9 @@ unless ARGV.empty?
   end.parse!(ARGV)
 end
 
+irbrc = File.expand_path("~/.irbrc")
+load(irbrc) if File.exist?(irbrc)
+
 IRB.formatter.filter_from_backtrace << /^#{__FILE__}/
 
 if ARGV.empty?
