@@ -1,0 +1,10 @@
+
+== 1.0.0.b / 2010-02-28
+
+* Add gist gadget
+
+== 1.0.0.a / 2010-02-27
+
+* Ruby 1.9 support
+
+== 2010-02-28 Forked Giles' utility_belt from version 1.1.0

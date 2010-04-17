@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+%w{rubygems platform net/http flyrb}.each {|library| require library}
+
+Flyrb.equip(:google)
+include Flyrb::Google
+
+google(ARGV[0])

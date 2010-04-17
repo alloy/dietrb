@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+%w{rubygems flyrb}.each {|library| require library}
+
+Flyrb.equip(:pastie)
+include Flyrb::Pastie
+
+pastie(ARGV[0])
