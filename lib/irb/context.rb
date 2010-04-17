@@ -7,6 +7,8 @@ module IRB
       attr_accessor :current
       
       def make_current(context)
+        # Messing with a current context is gonna bite me in the ass when we
+        # get to multi-threading, but we'll it when we get there.
         before, @current = @current, context
         yield
       ensure
@@ -26,7 +28,7 @@ module IRB
       @line    = 1
       clear_buffer
       
-      @processors = self.class.processors.map(&:new)
+      @processors = self.class.processors.map { |processor| processor.new(self) }
     end
     
     def __evaluate__(source, file = __FILE__, line = __LINE__)
@@ -87,8 +89,6 @@ module IRB
       
       true
     end
-    
-    private
     
     def formatter
       IRB.formatter
