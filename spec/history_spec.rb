@@ -22,6 +22,10 @@ describe "IRB::History" do
     @file.rewind; @file.read.should == "puts :ok\nfoo(x)\n"
   end
   
+  it "returns the same input value" do
+    IRB::History.input("foo(x)").should == "foo(x)"
+  end
+  
   it "returns the contents of the history file as an array of lines" do
     IRB::History.input "puts :ok"
     IRB::History.to_a.should == ["puts :ok"]
@@ -35,8 +39,8 @@ describe "IRB::History" do
     IRB::History.input "puts :ok"
     IRB::History.input "foo(x)"
     
-    IRB::History.init
-    IRB::History.init
+    IRB::History.new.should == IRB::History
+    IRB::History.new.should == IRB::History
     
     Readline::HISTORY.to_a.should == ["puts :ok", "foo(x)"]
   end

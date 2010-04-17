@@ -12,9 +12,13 @@ module IRB
       ensure
         @current = before
       end
+      
+      def processors
+        @processors ||= []
+      end
     end
     
-    attr_reader :object, :binding, :line, :source
+    attr_reader :object, :binding, :line, :source, :processors
     
     def initialize(object, explicit_binding = nil)
       @object  = object
@@ -22,7 +26,7 @@ module IRB
       @line    = 1
       clear_buffer
       
-      IRB::History.init
+      @processors = self.class.processors.map(&:new)
     end
     
     def __evaluate__(source, file = __FILE__, line = __LINE__)
@@ -37,9 +41,10 @@ module IRB
       puts formatter.exception(e)
     end
     
+    # Reads input and passes it to all processors.
     def readline
       input = Readline.readline(formatter.prompt(self), true)
-      input = IRB::History.input(input)
+      @processors.each { |processor| input = processor.input(input) }
       input
     rescue Interrupt
       clear_buffer

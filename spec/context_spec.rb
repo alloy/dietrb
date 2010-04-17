@@ -17,6 +17,12 @@ def stub_Readline
 end
 stub_Readline
 
+class TestProcessor
+  def input(s)
+    s * 2
+  end
+end
+
 main = self
 
 describe "IRB::Context" do
@@ -42,6 +48,17 @@ describe "IRB::Context" do
     @context.line.should == 1
     @context.source.should.be.instance_of IRB::Source
     @context.source.to_s.should == ""
+  end
+  
+  it "initializes with an instance of each processor" do
+    before = IRB::Context.processors.dup
+    begin
+      IRB::Context.processors << TestProcessor
+      @context = IRB::Context.new(main)
+      @context.processors.last.should.be.instance_of TestProcessor
+    ensure
+      IRB::Context.processors.replace(before)
+    end
   end
   
   it "does not use the same binding copy of the top level object" do
@@ -119,6 +136,12 @@ describe "IRB::Context, when receiving input" do
     Readline.stub_input("def foo")
     @context.readline.should == "def foo"
     Readline.received.should == ["irb(main):001:0> ", true]
+  end
+  
+  it "passes the input to all processors, which may return a new value" do
+    @context.processors << TestProcessor.new
+    Readline.stub_input("foo")
+    @context.readline.should == "foofoo"
   end
   
   it "processes the output" do
