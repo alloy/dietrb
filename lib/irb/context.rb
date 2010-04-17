@@ -21,6 +21,8 @@ module IRB
       @binding = explicit_binding || object.instance_eval { binding }
       @line    = 1
       clear_buffer
+      
+      IRB::History.init
     end
     
     def __evaluate__(source, file = __FILE__, line = __LINE__)
@@ -36,7 +38,9 @@ module IRB
     end
     
     def readline
-      Readline.readline(formatter.prompt(self), true)
+      input = Readline.readline(formatter.prompt(self), true)
+      input = IRB::History.input(input)
+      input
     rescue Interrupt
       clear_buffer
       ""
