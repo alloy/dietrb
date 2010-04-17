@@ -45,3 +45,88 @@ describe "IRB::History" do
     Readline::HISTORY.to_a.should == ["puts :ok", "foo(x)"]
   end
 end
+
+class << IRB::History
+  attr_reader :printed
+  
+  def reset
+    @printed = ""
+  end
+  
+  def print(s)
+    printed << s
+  end
+  
+  def puts(s)
+    printed << "#{s}\n"
+  end
+end
+
+describe "IRB::History, concerning the user api" do
+  it "shows by default a maximum of 50 history entries" do
+    IRB::History.max_entries_in_overview.should == 50
+  end
+  
+  before do
+    @sources = [
+      "puts :ok",
+      "foo(x)",
+      "class A",
+      "  def bar",
+      "    p :ok",
+      "  end",
+      "end",
+    ]
+    
+    Readline::HISTORY.clear
+    @sources.each { |source| Readline::HISTORY.push(source) }
+    
+    IRB::History.max_entries_in_overview = 5
+    
+    IRB::History.reset
+  end
+  
+  it "returns nil so that IRB doesn't cache some arbitrary line number" do
+    history.should == nil
+  end
+  
+  it "prints a formatted list with, by default IRB::History.max_entries_in_overview, number of history entries" do
+    history
+    
+    IRB::History.printed.should == %{
+2: class A
+3:   def bar
+4:     p :ok
+5:   end
+6: end
+}.sub(/\n/, '')
+  end
+  
+  it "prints a formatted list of N most recent history entries" do
+    history(7)
+    
+    IRB::History.printed.should == %{
+0: puts :ok
+1: foo(x)
+2: class A
+3:   def bar
+4:     p :ok
+5:   end
+6: end
+}.sub(/\n/, '')
+  end
+  
+  it "prints a formatted list of all history entries if the request number of entries is more than there is" do
+    history(777)
+
+    IRB::History.printed.should == %{
+0: puts :ok
+1: foo(x)
+2: class A
+3:   def bar
+4:     p :ok
+5:   end
+6: end
+}.sub(/\n/, '')
+  end
+end
