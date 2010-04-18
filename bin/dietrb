@@ -31,9 +31,6 @@ else
   path = ARGV.shift
   context = IRB::Context.new(self, TOPLEVEL_BINDING.dup)
   File.open(path, 'r') do |file|
-    file.each_line do |line|
-      puts IRB.formatter.prompt(context) + line
-      context.process_line(line)
-    end
+    file.each_line { |line| context.input_line(line) }
   end
 end

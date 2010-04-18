@@ -53,16 +53,12 @@ module IRB
       # we don't want to execute history! again
       @context.clear_buffer
       
-      lines = if entry_or_range.is_a?(Range)
-        entry_or_range.to_a.map { |i| Readline::HISTORY[i] }
+      if entry_or_range.is_a?(Range)
+        entry_or_range.to_a.each do |i|
+          @context.input_line(Readline::HISTORY[i])
+        end
       else
-        [Readline::HISTORY[entry_or_range]]
-      end
-      
-      lines.each do |line|
-        # TODO: this is also done by ./bin/dietrb when replaying a file
-        puts IRB.formatter.prompt(@context) + line
-        @context.process_line(line)
+        @context.input_line(Readline::HISTORY[entry_or_range])
       end
     end
   end

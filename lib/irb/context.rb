@@ -90,6 +90,11 @@ module IRB
       true
     end
     
+    def input_line(line)
+      puts formatter.prompt(self) + line
+      process_line(line)
+    end
+    
     def formatter
       IRB.formatter
     end

@@ -79,8 +79,8 @@ end
 describe "IRB::Context, when evaluating source" do
   before do
     @context = IRB::Context.new(main)
-    def @context.puts(string); @printed = string; end
-    def @context.printed;      @printed;          end
+    def @context.printed;      @printed ||= ''          end
+    def @context.puts(string); printed << "#{string}\n" end
   end
   
   it "evaluates code with the object's binding" do
@@ -89,8 +89,7 @@ describe "IRB::Context, when evaluating source" do
   
   it "prints the result" do
     @context.evaluate("Hash[:foo, :foo]")
-    printed = @context.instance_variable_get(:@printed)
-    printed.should == "=> {:foo=>:foo}"
+    @context.printed.should == "=> {:foo=>:foo}\n"
   end
   
   it "assigns the result to the local variable `_'" do
@@ -124,6 +123,12 @@ describe "IRB::Context, when evaluating source" do
     @context.process_line("DoesNotExist")
     @context.process_line("end")
     @context.printed.should.match /\(irb\):3:in.+\(irb\):2:in/m
+  end
+  
+  it "inputs a line to be processed, skipping readline" do
+    expected = "#{@context.formatter.prompt(@context)}2 * 21\n=> 42\n"
+    @context.input_line("2 * 21")
+    @context.printed.should == expected
   end
 end
 
