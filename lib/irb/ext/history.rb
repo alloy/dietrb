@@ -44,7 +44,9 @@ module IRB
         start_index = history_size - number_of_entries - 1
       end
       
-      start_index.upto(end_index) { |i| print_line(i) }
+      start_index.upto(end_index) do |i|
+        puts "#{i}: #{Readline::HISTORY[i]}"
+      end
     end
     
     def history!(entry_or_range)
@@ -62,13 +64,6 @@ module IRB
         puts IRB.formatter.prompt(@context) + line
         @context.process_line(line)
       end
-    end
-    
-    private
-    
-    def print_line(line_number, show_line_numbers = true)
-      print "#{line_number}: " if show_line_numbers
-      puts Readline::HISTORY[line_number]
     end
   end
 end
