@@ -91,6 +91,7 @@ describe "IRB::History, concerning the user api" do
       "    :ok",
       "  end",
       "end",
+      "THIS LINE REPRESENTS THE ENTERED COMMAND AND SHOULD BE OMITTED!"
     ]
     
     Readline::HISTORY.clear

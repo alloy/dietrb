@@ -36,11 +36,12 @@ module IRB
       history_size = Readline::HISTORY.size
       start_index = 0
       
+      # always remove one extra, because that's the `history' command itself
       if history_size <= number_of_entries
-        end_index = history_size - 1
+        end_index = history_size - 2
       else
-        end_index = history_size - 1
-        start_index = history_size - number_of_entries
+        end_index = history_size - 2
+        start_index = history_size - number_of_entries - 1
       end
       
       start_index.upto(end_index) { |i| print_line(i) }
