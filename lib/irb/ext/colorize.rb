@@ -1,5 +1,100 @@
 module IRB
   class ColoredFormatter < Formatter
+    TYPE_ALIASES = {
+      :on_comma           => :comma,
+      :refers             => :operator, # Wirble compat
+      :on_op              => :operator,
+      
+      :on_lbrace          => :open_hash,
+      :on_rbrace          => :close_hash,
+      :on_lbracket        => :open_array,
+      :on_rbracket        => :close_array,
+      
+      :on_ident           => :symbol,
+      :on_symbeg          => :symbol_prefix,
+      
+      :on_tstring_beg     => :open_string,
+      :on_tstring_content => :string,
+      :on_tstring_end     => :close_string,
+      
+      :on_int             => :number,
+      :on_kw              => :keyword,
+      :on_const           => :constant,
+      :class              => :constant # Wirble compat
+    }
+    
+    # # object colors
+    # :open_object        => :dark_gray,
+    # :object_class       => :purple,
+    # :object_addr_prefix => :blue,
+    # :object_line_prefix => :blue,
+    # :close_object       => :dark_gray,
+    
+    COLOR_SCHEMES = {
+      :dark_background => {
+        # :prompt             => :green,
+        # :result_prefix      => :light_purple,
+        
+        :comma              => :blue,
+        :operator           => :blue,
+        
+        :open_hash          => :green,
+        :close_hash         => :green,
+        :open_array         => :green,
+        :close_array        => :green,
+        
+        :symbol_prefix      => :yellow, # hmm ident...
+        :symbol             => :yellow,
+        
+        :open_string        => :red,
+        :string             => :cyan,
+        :close_string       => :red,
+        
+        :number             => :cyan,
+        :keyword            => :yellow,
+        :constant           => :light_green
+      },
+      :light_background => {
+        :comma              => :purple,
+        :operator           => :blue,
+        
+        :open_hash          => :red,
+        :close_hash         => :red,
+        :open_array         => :red,
+        :close_array        => :red,
+        
+        :symbol_prefix      => :black,
+        :symbol             => :light_gray,
+        
+        :open_string        => :blue,
+        :string             => :dark_gray,
+        :close_string       => :blue,
+        
+        :number             => :black,
+        :keyword            => :brown,
+        :constant           => :red
+      },
+      :fresh => {
+        :prompt             => :green,
+        :result_prefix      => :light_purple,
+        
+        :comma              => :red,
+        :operator           => :red,
+        
+        :open_hash          => :blue,
+        :close_hash         => :blue,
+        :open_array         => :green,
+        :close_array        => :green,
+        
+        :symbol_prefix      => :yellow,
+        :symbol             => :yellow,
+        
+        :number             => :cyan,
+        :string             => :cyan,
+        :keyword            => :white
+      }
+    }
+    
     #
     # Terminal escape codes for colors.
     #
@@ -34,86 +129,6 @@ module IRB
       CLEAR = escape(:nothing)
     end
     
-    COLOR_SCHEMES = {
-      :dark_background => {
-        # :prompt             => :green,
-        # :result_prefix      => :light_purple,
-        
-        # delimiter colors
-        :on_comma           => :blue,
-        :on_op              => :blue,
-        
-        # container colors (hash and array)
-        :on_lbrace          => :green,
-        :on_rbrace          => :green,
-        :on_lbracket        => :green,
-        :on_rbracket        => :green,
-        
-        # symbol colors
-        :on_ident           => :yellow, # hmm ident...
-        :on_symbeg          => :yellow,
-        
-        # string colors
-        :on_tstring_beg     => :red,
-        :on_tstring_content => :cyan,
-        :on_tstring_end     => :red,
-        
-        # misc colors
-        :on_int             => :cyan,
-        :on_kw              => :yellow,
-        :on_const           => :light_green
-      },
-      :light_background => {
-        :on_comma           => :purple,
-        :on_op              => :blue,
-
-        :on_lbrace          => :red,
-        :on_rbrace          => :red,
-        :on_lbracket        => :red,
-        :on_rbracket        => :red,
-
-        # # object colors
-        # :open_object        => :dark_gray,
-        # :object_class       => :purple,
-        # :object_addr_prefix => :blue,
-        # :object_line_prefix => :blue,
-        # :close_object       => :dark_gray,
-
-        # symbol colors
-        :on_ident           => :black,
-        :on_symbeg          => :light_gray,
-
-        # string colors
-        :on_tstring_beg     => :blue,
-        :on_tstring_content => :dark_gray,
-        :on_tstring_end     => :blue,
-
-        # misc colors
-        :on_int             => :black,
-        :on_kw              => :brown,
-        :on_const           => :red
-      },
-      :fresh => {
-        :prompt             => :green,
-        :result_prefix      => :light_purple,
-        
-        :on_comma           => :red,
-        :on_op              => :red,
-        
-        :on_lbrace          => :blue,
-        :on_rbrace          => :blue,
-        :on_lbracket        => :green,
-        :on_rbracket        => :green,
-        
-        :on_ident           => :yellow,
-        :on_symbeg          => :yellow,
-        
-        :on_int             => :cyan,
-        :on_tstring_content => :cyan,
-        :on_kw              => :white
-      }
-    }
-    
     attr_reader :colors, :color_scheme
     
     def initialize
@@ -126,8 +141,13 @@ module IRB
       @color_scheme = scheme
     end
     
+    def color(type)
+      type = TYPE_ALIASES[type] if TYPE_ALIASES.has_key?(type)
+      @colors[type]
+    end
+    
     def colorize_token(type, token)
-      if color = colors[type]
+      if color = color(type)
         "#{Color.escape(color)}#{token}#{Color::CLEAR}"
       else
         token
