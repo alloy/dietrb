@@ -122,7 +122,7 @@ module IRB
     end
     
     def result(object)
-      "#{result_prefix} #{colorize(object.inspect)}"
+      "#{result_prefix} #{colorize(inspect_object(object))}"
     end
   end
 end

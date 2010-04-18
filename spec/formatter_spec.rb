@@ -54,6 +54,12 @@ describe "IRB::Formatter" do
     @formatter.result(:foo => :foo).should == "=> {:foo=>:foo}"
   end
   
+  it "prints the result with object#pretty_inspect, if it responds to it" do
+    object = Object.new
+    def object.pretty_inspect; "foo"; end
+    @formatter.result(object).should == "foo"
+  end
+  
   it "prints that a syntax error occurred on the last line and reset the buffer to the previous line" do
     @formatter.syntax_error(2, "syntax error, unexpected '}'").should ==
       "SyntaxError: compile error\n(irb):2: syntax error, unexpected '}'"

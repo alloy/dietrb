@@ -27,8 +27,12 @@ module IRB
       end
     end
     
+    def inspect_object(object)
+      object.respond_to?(:pretty_inspect) ? object.pretty_inspect : object.inspect
+    end
+    
     def result(object)
-      "=> #{object.inspect}"
+      "=> #{inspect_object(object)}"
     end
     
     def syntax_error(line, message)
