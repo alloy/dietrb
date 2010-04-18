@@ -436,6 +436,7 @@ module Wirble
         def output_value
           if @context.inspect?
             val = Colorize.colorize(@context.last_value.inspect)
+            p val
             printf @context.return_format, val
           else
             printf @context.return_format, @context.last_value

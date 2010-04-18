@@ -1,6 +1,6 @@
 module IRB
-  def self.formatter
-    @formatter ||= Formatter.new
+  class << self
+    attr_accessor :formatter
   end
   
   class Formatter
@@ -47,3 +47,5 @@ module IRB
     end
   end
 end
+
+IRB.formatter = IRB::Formatter.new
