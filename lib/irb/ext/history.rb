@@ -45,7 +45,6 @@ module IRB
       end
       
       start_index.upto(end_index) { |i| print_line(i) }
-      nil
     end
     
     def history!(entry_or_range)
@@ -63,7 +62,6 @@ module IRB
         puts IRB.formatter.prompt(@context) + line
         @context.process_line(line)
       end
-      nil
     end
     
     private
@@ -78,16 +76,19 @@ end
 module Kernel
   def history(number_of_entries = IRB::History.max_entries_in_overview)
     IRB::History.current.history(number_of_entries)
+    nil
   end
   alias_method :h, :history
   
   def history!(entry_or_range)
     IRB::History.current.history!(entry_or_range)
+    nil
   end
   alias_method :h!, :history!
   
   def clear_history!
     IRB::History.current.clear!
+    nil
   end
 end
 
