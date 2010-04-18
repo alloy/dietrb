@@ -45,6 +45,15 @@ describe "IRB::History" do
     
     Readline::HISTORY.to_a.should == ["puts :ok", "foo(x)"]
   end
+  
+  it "clears the history and history file" do
+    @history.input "puts :ok"
+    @history.input "foo(x)"
+    @history.clear!
+    
+    @file.rewind; @file.read.should.be.empty
+    Readline::HISTORY.to_a.should.be.empty
+  end
 end
 
 class IRB::History
@@ -58,6 +67,13 @@ class IRB::History
   
   def puts(s)
     printed << "#{s}\n"
+  end
+  
+  def clear!
+    @cleared = true
+  end
+  def cleared?
+    @cleared
   end
 end
 
@@ -145,5 +161,10 @@ describe "IRB::History, concerning the user api" do
   it "evaluates the history entries specified by a range" do
     history! 2..6
     @context.__evaluate__("AAA.new.bar").should == :ok
+  end
+  
+  it "clears the history and history file" do
+    clear_history!
+    @history.should.be.cleared
   end
 end

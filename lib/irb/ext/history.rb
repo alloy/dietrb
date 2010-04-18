@@ -27,6 +27,11 @@ module IRB
       File.read(self.class.file).split("\n")
     end
     
+    def clear!
+      File.open(self.class.file, "w") { |f| f << "" }
+      Readline::HISTORY.clear
+    end
+    
     def history(number_of_entries = max_entries_in_overview)
       history_size = Readline::HISTORY.size
       start_index = 0
@@ -79,6 +84,10 @@ module Kernel
     IRB::History.current.history!(entry_or_range)
   end
   alias_method :h!, :history!
+  
+  def clear_history!
+    IRB::History.current.clear!
+  end
 end
 
 IRB::Context.processors << IRB::History
