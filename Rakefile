@@ -26,6 +26,7 @@ begin
     gemspec.authors = ["Eloy Duran"]
     
     gemspec.required_ruby_version = ::Gem::Requirement.new("~> 1.9")
+    gemspec.files.reject! { |file| file =~ /^extensions/ }
   end
 rescue LoadError
 end

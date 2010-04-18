@@ -1,4 +1,6 @@
 module IRB
+  # This code is based upon Wirble (http://pablotron.org/software/wirble/) by
+  # Paul Duncan and Jens Wille.
   class ColoredFormatter < Formatter
     TYPE_ALIASES = {
       :on_comma           => :comma,
