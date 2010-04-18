@@ -28,7 +28,7 @@ module IRB
       # Return the escape code for a given color.
       #
       def self.escape(key)
-        COLORS.key?(key) && "\033[#{COLORS[key]}m"
+        COLORS.key?(key) && "\e[#{COLORS[key]}m"
       end
       
       CLEAR = escape(:nothing)
@@ -38,6 +38,9 @@ module IRB
     # Default Wirble color scheme.
     # 
     DEFAULT_COLOR_SCHEME = {
+      :prompt             => :green,
+      :result_prefix      => :light_purple,
+      
       # delimiter colors
       :on_comma           => :blue,
       :on_op              => :blue,
@@ -98,19 +101,28 @@ module IRB
       @colors ||= {}.update(DEFAULT_COLOR_SCHEME)
     end
     
+    def colorize_token(type, token)
+      if color = colors[type]
+        "#{Color.escape(color)}#{token}#{Color::CLEAR}"
+      else
+        token
+      end
+    end
+    
     def colorize(str)
-      Ripper.lex(str).map do |_, type, token|
-        # p type, token
-        if color = colors[type]
-          "#{Color.escape(color)}#{token}#{Color::CLEAR}"
-        else
-          token
-        end
-      end.join
+      Ripper.lex(str).map { |_, type, token| colorize_token(type, token) }.join
+    end
+    
+    def prompt(context)
+      colorize_token(:prompt, super)
+    end
+    
+    def result_prefix
+      colorize_token(:result_prefix, "=>")
     end
     
     def result(object)
-      "=> #{colorize(object.inspect)}"
+      "#{result_prefix} #{colorize(object.inspect)}"
     end
   end
 end

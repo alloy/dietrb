@@ -6,6 +6,7 @@ main = self
 describe "IRB::ColoredFormatter" do
   before do
     @formatter = IRB::ColoredFormatter.new
+    @formatter.colors.delete(:result_prefix)
     @context = IRB::Context.new(main)
   end
   
@@ -29,5 +30,15 @@ describe "IRB::ColoredFormatter" do
   
   it "colorizes an Array" do
     @formatter.result([1, 2]).should == "=> \e[0;32m[\e[0;0m\e[0;36m1\e[0;0m\e[0;34m,\e[0;0m \e[0;36m2\e[0;0m\e[0;32m]\e[0;0m"
+  end
+  
+  it "colorizes the prompt" do
+    @formatter.colors[:prompt] = :light_green
+    @formatter.prompt(@context).should == "\e[1;32m#{IRB::Formatter.new.prompt(@context)}\e[0;0m"
+  end
+  
+  it "colorizes the result prefix" do
+    @formatter.colors[:result_prefix] = :light_red
+    @formatter.result("").should == "\e[1;31m=>\e[0;0m \e[0;31m\"\e[0;0m\e[0;31m\"\e[0;0m"
   end
 end
