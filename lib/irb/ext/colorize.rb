@@ -20,6 +20,7 @@ module IRB
       :on_tstring_end     => :close_string,
       
       :on_int             => :number,
+      :on_float           => :number,
       :on_kw              => :keyword,
       :on_const           => :constant,
       :class              => :constant # Wirble compat
