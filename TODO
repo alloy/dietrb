@@ -4,3 +4,4 @@
 * Make sure the majority of the utils in utility_belt work
 * Possibly add copy-paste support as an ext
 * Make sure ported/used code is attributed
+* Decide whether or not we need more control for colorizing which could be done with Ripper::SexpBuilder

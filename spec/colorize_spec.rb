@@ -10,7 +10,13 @@ describe "IRB::ColoredFormatter" do
   end
   
   it "colorizes a constant" do
-    @formatter.result("Hash").should == "=> \e[1;32mHash\e[0;0m"
+    @formatter.result(Hash).should == "=> \e[1;32mHash\e[0;0m"
+  end
+  
+  # Not Wirble compliant
+  it "colorizes a Range" do
+    # @formatter.result(1..3).should == "=> \e[0;36m1\e[0;0m\e[0;31m..\e[0;0m\e[0;36m3\e[0;0m"
+    @formatter.result(1..3).should == "=> \e[0;36m1\e[0;0m\e[0;34m..\e[0;0m\e[0;36m3\e[0;0m"
   end
   
   it "colorizes a String" do

@@ -48,13 +48,6 @@ module IRB
       :on_lbracket        => :green,
       :on_rbracket        => :green,
       
-      # object colors
-      :open_object        => :light_red,
-      :object_class       => :white,
-      :object_addr_prefix => :blue,
-      :object_line_prefix => :blue,
-      :close_object       => :light_red,
-      
       # symbol colors
       :on_ident           => :yellow, # hmm ident...
       :on_symbeg          => :yellow,
@@ -67,8 +60,14 @@ module IRB
       # misc colors
       :on_int             => :cyan,
       :keyword            => :green,
-      :class              => :light_green,
-      :range              => :red,
+      :on_const           => :light_green,
+      
+      # object colors
+      # :open_object        => :light_red,
+      # :object_class       => :white,
+      # :object_addr_prefix => :blue,
+      # :object_line_prefix => :blue,
+      # :close_object       => :light_red,
     }
     
     #
@@ -91,7 +90,6 @@ module IRB
       :number           => :cyan,
       :string           => :cyan,
       :keyword          => :white,
-      :range            => :light_blue,
     }
     
     attr_reader :colors
@@ -102,7 +100,7 @@ module IRB
     
     def colorize(str)
       Ripper.lex(str).map do |_, type, token|
-        p type, token
+        # p type, token
         if color = colors[type]
           "#{Color.escape(color)}#{token}#{Color::CLEAR}"
         else
