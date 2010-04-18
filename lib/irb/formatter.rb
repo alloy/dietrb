@@ -7,6 +7,7 @@ module IRB
     DEFAULT_PROMPT = "irb(%s):%03d:%d> "
     SIMPLE_PROMPT  = ">> "
     NO_PROMPT      = ""
+    RESULT_PREFIX  = "=>"
     SYNTAX_ERROR   = "SyntaxError: compile error\n(irb):%d: %s"
     SOURCE_ROOT    = /^#{File.expand_path('../../../', __FILE__)}/
     
@@ -32,7 +33,7 @@ module IRB
     end
     
     def result(object)
-      "=> #{inspect_object(object)}"
+      "#{RESULT_PREFIX} #{inspect_object(object)}"
     end
     
     def syntax_error(line, message)

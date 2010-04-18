@@ -6,7 +6,6 @@ main = self
 describe "IRB::ColoredFormatter" do
   before do
     @formatter = IRB::ColoredFormatter.new
-    @formatter.colors.delete(:result_prefix)
     @context = IRB::Context.new(main)
   end
   
@@ -40,5 +39,15 @@ describe "IRB::ColoredFormatter" do
   it "colorizes the result prefix" do
     @formatter.colors[:result_prefix] = :light_red
     @formatter.result("").should == "\e[1;31m=>\e[0;0m \e[0;31m\"\e[0;0m\e[0;31m\"\e[0;0m"
+  end
+  
+  it "uses the default color scheme by default" do
+    @formatter.color_scheme.should == :default
+  end
+  
+  it "changes color scheme" do
+    @formatter.color_scheme = :fresh
+    @formatter.color_scheme.should == :fresh
+    @formatter.colors[:result_prefix].should == :light_purple
   end
 end

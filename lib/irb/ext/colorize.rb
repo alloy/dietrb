@@ -27,78 +27,73 @@ module IRB
       #
       # Return the escape code for a given color.
       #
-      def self.escape(key)
-        COLORS.key?(key) && "\e[#{COLORS[key]}m"
+      def self.escape(name)
+        COLORS.key?(name) && "\e[#{COLORS[name]}m"
       end
       
       CLEAR = escape(:nothing)
     end
     
-    #
-    # Default Wirble color scheme.
-    # 
-    DEFAULT_COLOR_SCHEME = {
-      :prompt             => :green,
-      :result_prefix      => :light_purple,
-      
-      # delimiter colors
-      :on_comma           => :blue,
-      :on_op              => :blue,
-      
-      # container colors (hash and array)
-      :on_lbrace          => :green,
-      :on_rbrace          => :green,
-      :on_lbracket        => :green,
-      :on_rbracket        => :green,
-      
-      # symbol colors
-      :on_ident           => :yellow, # hmm ident...
-      :on_symbeg          => :yellow,
-      
-      # string colors
-      :on_tstring_beg     => :red,
-      :on_tstring_content => :cyan,
-      :on_tstring_end     => :red,
-      
-      # misc colors
-      :on_int             => :cyan,
-      :keyword            => :green,
-      :on_const           => :light_green,
-      
-      # object colors
-      # :open_object        => :light_red,
-      # :object_class       => :white,
-      # :object_addr_prefix => :blue,
-      # :object_line_prefix => :blue,
-      # :close_object       => :light_red,
+    COLOR_SCHEMES = {
+      :default => {
+        # :prompt             => :green,
+        # :result_prefix      => :light_purple,
+        
+        # delimiter colors
+        :on_comma           => :blue,
+        :on_op              => :blue,
+        
+        # container colors (hash and array)
+        :on_lbrace          => :green,
+        :on_rbrace          => :green,
+        :on_lbracket        => :green,
+        :on_rbracket        => :green,
+        
+        # symbol colors
+        :on_ident           => :yellow, # hmm ident...
+        :on_symbeg          => :yellow,
+        
+        # string colors
+        :on_tstring_beg     => :red,
+        :on_tstring_content => :cyan,
+        :on_tstring_end     => :red,
+        
+        # misc colors
+        :on_int             => :cyan,
+        :on_kw              => :yellow,
+        :on_const           => :light_green
+      },
+      :fresh => {
+        :prompt             => :green,
+        :result_prefix      => :light_purple,
+        
+        :on_comma           => :red,
+        :on_op              => :red,
+        
+        :on_lbrace          => :blue,
+        :on_rbrace          => :blue,
+        :on_lbracket        => :green,
+        :on_rbracket        => :green,
+        
+        :on_ident           => :yellow,
+        :on_symbeg          => :yellow,
+        
+        :on_int             => :cyan,
+        :on_tstring_content => :cyan,
+        :on_kw              => :white,
+      }
     }
     
-    #
-    # Fruity testing colors.
-    # 
-    TESTING_COLOR_SCHEME = {
-      :comma            => :red,
-      :refers           => :red,
-      :open_hash        => :blue,
-      :close_hash       => :blue,
-      :open_array       => :green,
-      :close_array      => :green,
-      :open_object      => :light_red,
-      :object_class     => :light_green,
-      :object_addr      => :purple,
-      :object_line      => :light_purple,
-      :close_object     => :light_red,
-      :symbol           => :yellow,
-      :symbol_prefix    => :yellow,
-      :number           => :cyan,
-      :string           => :cyan,
-      :keyword          => :white,
-    }
+    attr_reader :colors, :color_scheme
     
-    attr_reader :colors
+    def initialize
+      super
+      self.color_scheme = :default
+    end
     
-    def colors
-      @colors ||= {}.update(DEFAULT_COLOR_SCHEME)
+    def color_scheme=(scheme)
+      @colors = COLOR_SCHEMES[scheme].dup
+      @color_scheme = scheme
     end
     
     def colorize_token(type, token)
@@ -118,7 +113,7 @@ module IRB
     end
     
     def result_prefix
-      colorize_token(:result_prefix, "=>")
+      colorize_token(:result_prefix, Formatter::RESULT_PREFIX)
     end
     
     def result(object)
