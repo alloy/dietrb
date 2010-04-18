@@ -35,7 +35,7 @@ module IRB
     end
     
     COLOR_SCHEMES = {
-      :default => {
+      :dark_background => {
         # :prompt             => :green,
         # :result_prefix      => :light_purple,
         
@@ -63,6 +63,36 @@ module IRB
         :on_kw              => :yellow,
         :on_const           => :light_green
       },
+      :light_background => {
+        :on_comma           => :purple,
+        :on_op              => :blue,
+
+        :on_lbrace          => :red,
+        :on_rbrace          => :red,
+        :on_lbracket        => :red,
+        :on_rbracket        => :red,
+
+        # # object colors
+        # :open_object        => :dark_gray,
+        # :object_class       => :purple,
+        # :object_addr_prefix => :blue,
+        # :object_line_prefix => :blue,
+        # :close_object       => :dark_gray,
+
+        # symbol colors
+        :on_ident           => :black,
+        :on_symbeg          => :light_gray,
+
+        # string colors
+        :on_tstring_beg     => :blue,
+        :on_tstring_content => :dark_gray,
+        :on_tstring_end     => :blue,
+
+        # misc colors
+        :on_int             => :black,
+        :on_kw              => :brown,
+        :on_const           => :red
+      },
       :fresh => {
         :prompt             => :green,
         :result_prefix      => :light_purple,
@@ -80,7 +110,7 @@ module IRB
         
         :on_int             => :cyan,
         :on_tstring_content => :cyan,
-        :on_kw              => :white,
+        :on_kw              => :white
       }
     }
     
@@ -88,7 +118,7 @@ module IRB
     
     def initialize
       super
-      self.color_scheme = :default
+      self.color_scheme = :dark_background
     end
     
     def color_scheme=(scheme)

@@ -41,8 +41,8 @@ describe "IRB::ColoredFormatter" do
     @formatter.result("").should == "\e[1;31m=>\e[0;0m \e[0;31m\"\e[0;0m\e[0;31m\"\e[0;0m"
   end
   
-  it "uses the default color scheme by default" do
-    @formatter.color_scheme.should == :default
+  it "uses the dark_background color scheme by default" do
+    @formatter.color_scheme.should == :dark_background
   end
   
   it "changes color scheme" do
