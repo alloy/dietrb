@@ -34,6 +34,18 @@ describe "IRB::History" do
     @history.to_a.should == ["puts :ok", "foo(x)"]
   end
   
+  it "returns an empty array if the history file doesn't exist yet and create it once input is added" do
+    @file.close
+    FileUtils.rm(@file.path)
+    
+    @history.to_a.should == []
+    File.should.not.exist @file.path
+    
+    @history.input "puts :ok"
+    File.should.exist @file.path
+    @history.to_a.should == ["puts :ok"]
+  end
+  
   it "stores the contents of the history file in Readline::HISTORY once" do
     Readline::HISTORY.clear
     

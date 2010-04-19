@@ -26,7 +26,8 @@ module IRB
     end
     
     def to_a
-      File.read(self.class.file).split("\n")
+      file = self.class.file
+      File.exist?(file) ? File.read(file).split("\n") : []
     end
     
     def clear!
