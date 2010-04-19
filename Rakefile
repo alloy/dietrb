@@ -16,6 +16,20 @@ task :run do
   sh "ruby19 -Ilib ./bin/dietrb -r irb/ext/completion -r irb/ext/colorize -r pp"
 end
 
+desc "AOT compile for MacRuby"
+task :macruby_compile do
+  FileList["lib/**/*.rb"].each do |source|
+    sh "macrubyc --arch i386 --arch x86_64 -C '#{source}' -o '#{source}o'"
+  end
+end
+
+desc "Clean MacRuby binaries"
+task :clean do
+  FileList["lib/**/*.rbo"].each do |bin|
+    rm bin
+  end
+end
+
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |gemspec|
