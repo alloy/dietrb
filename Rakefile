@@ -32,8 +32,10 @@ end
 
 begin
   require 'jeweler'
+  require File.expand_path('../lib/irb/version', __FILE__)
   Jeweler::Tasks.new do |gemspec|
     gemspec.name = "dietrb"
+    gemspec.version = IRB::VERSION::STRING
     gemspec.summary = gemspec.description = "IRB on a diet, for MacRuby / Ruby 1.9"
     gemspec.email = "eloy.de.enige@gmail.com"
     gemspec.homepage = "http://github.com/alloy/dietrb"
