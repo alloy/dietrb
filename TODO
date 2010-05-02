@@ -1,5 +1,3 @@
-* Add history manager support
-* Add colored output, possibly based on the Wirble code
 * Make sure the following formatters work: hirb, awesome_print, and looksee
 * Make sure the majority of the utils in utility_belt work
 * Possibly add copy-paste support as an ext
