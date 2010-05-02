@@ -1,5 +1,6 @@
 require 'irb/context'
 require 'irb/source'
+require 'irb/version'
 
 require 'irb/ext/history'
 
