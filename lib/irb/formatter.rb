@@ -1,3 +1,9 @@
+# MacRuby implementation of IRB.
+#
+# This file is covered by the Ruby license. See COPYING for more details.
+# 
+# Copyright (C) 2009-2010, Eloy Duran <eloy.de.enige@gmail.com>
+
 module IRB
   class << self
     attr_accessor :formatter

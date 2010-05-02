@@ -1,6 +1,12 @@
+# MacRuby implementation of IRB.
+#
+# This file is covered by the Ruby license. See COPYING for more details.
+# 
+# Copyright (C) 2009-2010, Eloy Duran <eloy.de.enige@gmail.com>
+#
+# Portions Copyright (C) 2006-2010 Ben Bleything <ben@bleything.net> (Kernel#history & Kernel#history!)
+
 module IRB
-  # The util methods, history and history!, were taken from Ben Bleything's
-  # command_history.rb in utility_belt.
   class History
     class << self
       attr_accessor :file, :max_entries_in_overview

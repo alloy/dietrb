@@ -1,6 +1,14 @@
+# MacRuby implementation of IRB.
+#
+# This file is covered by the Ruby license. See COPYING for more details.
+# 
+# Copyright (C) 2009-2010, Eloy Duran <eloy.de.enige@gmail.com>
+#
+# Portions Copyright (C) 2006-2010 Paul Duncan <pabs@pablotron.org> (Wirble)
+# Portions Copyright (C) 2009-2010 Jens Wille <jens.wille@gmail.com> (Wirble)
+# Portions Copyright (C) 2006-2010 Giles Bowkett (light background color scheme)
+
 module IRB
-  # This code is based upon Wirble (http://pablotron.org/software/wirble/) by
-  # Paul Duncan and Jens Wille.
   class ColoredFormatter < Formatter
     TYPE_ALIASES = {
       :on_comma           => :comma,
