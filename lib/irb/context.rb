@@ -34,6 +34,7 @@ module IRB
       @line    = 1
       clear_buffer
       
+      @underscore_assigner = __evaluate__("_ = nil; proc { |val| _ = val }")
       @processors = self.class.processors.map { |processor| processor.new(self) }
     end
     
@@ -42,7 +43,8 @@ module IRB
     end
     
     def evaluate(source)
-      result = __evaluate__("_ = (#{source})", '(irb)', @line - @source.buffer.size + 1)
+      result = __evaluate__(source.to_s, '(irb)', @line - @source.buffer.size + 1)
+      store_result(result)
       puts formatter.result(result)
       result
     rescue Exception => e
@@ -107,6 +109,10 @@ module IRB
     
     def clear_buffer
       @source = Source.new
+    end
+    
+    def store_result(result)
+      @underscore_assigner.call(result)
     end
   end
 end
