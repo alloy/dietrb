@@ -11,6 +11,16 @@ not grow too much more. For now my things to-do are .irbrc support, completion,
 and investigate what else people really really need. After that it's time to
 polish.
 
+= Important notice
+
+Since on Ruby 1.9 *all* latest gems are pushed onto the load path by default,
+installing the DietRB gem will break the existing IRB binary.
+
+  % irb19
+  /usr/local/bin/irb19:12:in `<main>': undefined method `start' for IRB:Module (NoMethodError)
+
+So you probably just want to alias dietrb to irb.
+
 == Extensions
 
 * irb/ext/colorize.rb, adds support for colorizing the prompt and result. The
