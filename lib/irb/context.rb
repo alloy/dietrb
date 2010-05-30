@@ -48,6 +48,7 @@ module IRB
       puts formatter.result(result)
       result
     rescue Exception => e
+      store_exception(e)
       puts formatter.exception(e)
     end
     
@@ -113,6 +114,10 @@ module IRB
     
     def store_result(result)
       @underscore_assigner.call(result)
+    end
+    
+    def store_exception(exception)
+      $e = $EXCEPTION = exception
     end
   end
 end
