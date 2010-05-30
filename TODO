@@ -1,5 +1,4 @@
 * Make sure the following formatters work: hirb, awesome_print, and looksee
 * Make sure the majority of the utils in utility_belt work
 * Possibly add copy-paste support as an ext
-* Make sure ported/used code is attributed and contact authors about Ruby license
 * Decide whether or not we need more control for colorizing which could be done with Ripper::SexpBuilder
