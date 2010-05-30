@@ -13,7 +13,7 @@ end
 
 desc "Run dietrb with ruby19"
 task :run do
-  sh "ruby19 -Ilib ./bin/dietrb -r irb/ext/completion -r irb/ext/colorize -r pp"
+  sh "ruby19 -Ilib ./bin/dietrb -r irb/ext/colorize -r pp"
 end
 
 desc "AOT compile for MacRuby"
