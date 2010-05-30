@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{dietrb}
-  s.version = "0.4.2"
+  s.version = "0.4.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Eloy Duran"]
-  s.date = %q{2010-05-02}
+  s.date = %q{2010-05-30}
   s.default_executable = %q{dietrb}
   s.description = %q{IRB on a diet, for MacRuby / Ruby 1.9}
   s.email = %q{eloy.de.enige@gmail.com}
@@ -20,15 +20,16 @@ Gem::Specification.new do |s|
      "TODO"
   ]
   s.files = [
-    ".gitignore",
-     "LICENSE",
+    "LICENSE",
      "README.rdoc",
      "Rakefile",
      "TODO",
      "bin/dietrb",
      "dietrb.gemspec",
      "lib/irb.rb",
+     "lib/irb/completion.rb",
      "lib/irb/context.rb",
+     "lib/irb/deprecated.rb",
      "lib/irb/ext/colorize.rb",
      "lib/irb/ext/completion.rb",
      "lib/irb/ext/history.rb",
@@ -41,6 +42,7 @@ Gem::Specification.new do |s|
      "spec/context_spec.rb",
      "spec/formatter_spec.rb",
      "spec/history_spec.rb",
+     "spec/regression/context_spec.rb",
      "spec/source_spec.rb",
      "spec/spec_helper.rb"
   ]
@@ -56,6 +58,7 @@ Gem::Specification.new do |s|
      "spec/context_spec.rb",
      "spec/formatter_spec.rb",
      "spec/history_spec.rb",
+     "spec/regression/context_spec.rb",
      "spec/source_spec.rb",
      "spec/spec_helper.rb"
   ]
