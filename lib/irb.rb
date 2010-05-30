@@ -8,6 +8,8 @@ require 'irb/context'
 require 'irb/source'
 require 'irb/version'
 
+require 'irb/deprecated'
+
 require 'irb/ext/history'
 require 'irb/ext/completion'
 
