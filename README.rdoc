@@ -14,12 +14,10 @@ polish.
 = Important notice
 
 Since on Ruby 1.9 *all* latest gems are pushed onto the load path by default,
-installing the DietRB gem will break the existing IRB binary.
+installing the DietRB gem would break the existing IRB binary. Therefor, with
+the DietRB gem is installed, it will hijack the `irb' bin file.
 
-  % irb19
-  /usr/local/bin/irb19:12:in `<main>': undefined method `start' for IRB:Module (NoMethodError)
-
-So you probably just want to alias dietrb to irb.
+The original IRB will still work when you uninstall the DietRB gem, though.
 
 == Extensions
 
