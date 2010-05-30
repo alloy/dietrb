@@ -130,6 +130,16 @@ describe "IRB::Source::Reflector" do
     reflect("if true").should.not.be.code_block
     reflect("p :ok if true").should.be.code_block
   end
+
+  it "returns whether or not the current session should be terminated" do
+    reflect("exit").should.terminate
+    reflect("quit").should.terminate
+    reflect("def foo; end; exit").should.terminate
+    reflect("def foo; end; quit").should.terminate
+
+    reflect("def foo; exit; end").should.not.terminate
+    reflect("def foo; quit; end").should.not.terminate
+  end
   
   it "returns whether or not the source contains a syntax error, except a code block not ending" do
     reflect("def;").should.have.syntax_error

@@ -85,7 +85,7 @@ module IRB
     #   process_line("quit") # => false
     def process_line(line)
       @source << line
-      return false if @source.to_s == "quit"
+      return false if @source.terminate?
       
       if @source.syntax_error?
         puts formatter.syntax_error(@line, @source.syntax_error)
