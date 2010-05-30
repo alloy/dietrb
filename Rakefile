@@ -3,7 +3,8 @@ task :default => :run
 desc "Run the specs"
 task :spec do
   # sh "macbacon #{FileList['spec/**/*_spec.rb'].join(' ')}"
-  sh "bacon19 #{FileList['spec/**/*_spec.rb'].join(' ')}"
+  bacon = `which bacon19 || which bacon`.chomp
+  sh "#{bacon} #{FileList['spec/**/*_spec.rb'].join(' ')}"
 end
 
 desc "Run specs with Kicker"
@@ -13,7 +14,8 @@ end
 
 desc "Run dietrb with ruby19"
 task :run do
-  sh "ruby19 -Ilib ./bin/dietrb -r irb/ext/colorize -r pp"
+  ruby = `which ruby19 || which ruby`.chomp
+  sh "#{ruby} -Ilib ./bin/dietrb -r irb/ext/colorize -r pp"
 end
 
 desc "AOT compile for MacRuby"
