@@ -81,6 +81,7 @@ describe "IRB::Context, when evaluating source" do
     @context = IRB::Context.new(main)
     def @context.printed;      @printed ||= ''          end
     def @context.puts(string); printed << "#{string}\n" end
+    IRB.formatter = IRB::Formatter.new
   end
   
   it "evaluates code with the object's binding" do
