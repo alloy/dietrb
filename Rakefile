@@ -1,21 +1,18 @@
+def ruby_bin
+  require 'rbconfig'
+  File.join(Config::CONFIG['prefix'], 'bin', Config::CONFIG['ruby_install_name'])
+end
+
 task :default => :run
 
-desc "Run the specs"
+desc "Run the specs (run it with a rake installed on the Ruby version you want to run the specs on)"
 task :spec do
-  # sh "macbacon #{FileList['spec/**/*_spec.rb'].join(' ')}"
-  bacon = `which bacon19 || which bacon`.chomp
-  sh "#{bacon} #{FileList['spec/**/*_spec.rb'].join(' ')}"
+  sh "#{ruby_bin} -r #{FileList['./spec/**/*_spec.rb'].join(' -r ')} -e ''"
 end
 
-desc "Run specs with Kicker"
-task :kick do
-  sh "kicker -e 'rake spec' lib spec"
-end
-
-desc "Run dietrb with ruby19"
+desc "Run dietrb"
 task :run do
-  ruby = `which ruby19 || which ruby`.chomp
-  sh "#{ruby} -Ilib ./bin/dietrb -r irb/ext/colorize -r pp"
+  sh "#{ruby_bin} -I lib ./bin/dietrb -r irb/ext/colorize -r pp"
 end
 
 desc "AOT compile for MacRuby"
