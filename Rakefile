@@ -15,17 +15,38 @@ task :run do
   sh "#{ruby_bin} -I lib ./bin/dietrb -r irb/ext/colorize -r pp"
 end
 
-desc "AOT compile for MacRuby"
-task :macruby_compile do
-  FileList["lib/**/*.rb"].each do |source|
-    sh "macrubyc --arch i386 --arch x86_64 -C '#{source}' -o '#{source}o'"
+namespace :macruby do
+  desc "AOT compile for MacRuby"
+  task :compile do
+    FileList["lib/**/*.rb"].each do |source|
+      sh "macrubyc --arch i386 --arch x86_64 -C '#{source}' -o '#{source}o'"
+    end
   end
-end
-
-desc "Clean MacRuby binaries"
-task :clean do
-  FileList["lib/**/*.rbo"].each do |bin|
-    rm bin
+  
+  desc "Clean MacRuby binaries"
+  task :clean do
+    FileList["lib/**/*.rbo"].each do |bin|
+      rm bin
+    end
+  end
+  
+  desc "Merge source into the MacRuby repo"
+  task :merge do
+    if (repo = ENV['macruby_repo']) && File.exist?(repo)
+      bin = File.join(repo, 'bin/irb')
+      lib = File.join(repo, 'lib')
+      
+      rm_f bin
+      rm_f File.join(lib, 'irb.rb')
+      rm_rf File.join(lib, 'irb')
+      
+      cp 'bin/dietrb', bin
+      cp 'lib/irb.rb', lib
+      cp_r 'lib/irb', lib
+    else
+      puts "[!] Set the `macruby_repo' env variable to point to the MacRuby repo checkout"
+      exit 1
+    end
   end
 end
 
