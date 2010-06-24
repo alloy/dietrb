@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{dietrb}
-  s.version = "0.4.5"
+  s.version = "0.4.6"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Eloy Duran"]
-  s.date = %q{2010-05-30}
+  s.date = %q{2010-06-24}
   s.default_executable = %q{dietrb}
   s.description = %q{IRB on a diet, for MacRuby / Ruby 1.9}
   s.email = %q{eloy.de.enige@gmail.com}
