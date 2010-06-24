@@ -60,6 +60,17 @@ describe "IRB::Formatter" do
     @formatter.result(object).should == "=> foo"
   end
   
+  it "prints only the class name and memory address in `no inspect' mode" do
+    @formatter.inspect = false
+    
+    object = Object.new
+    def object.inspect; @inspected = true; "Never called!"; end
+    def object.__id__; 2158110700; end
+    
+    @formatter.result(object).should == "=> #<Object:0x101444fd8>"
+    object.instance_variable_get(:@inspected).should.not == true
+  end
+  
   it "prints that a syntax error occurred on the last line and reset the buffer to the previous line" do
     @formatter.syntax_error(2, "syntax error, unexpected '}'").should ==
       "SyntaxError: compile error\n(irb):2: syntax error, unexpected '}'"
