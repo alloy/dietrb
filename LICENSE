@@ -4,6 +4,7 @@ Portions Copyright (c) 2006-2010 Ben Bleything <ben@bleything.net> (history util
 Portions Copyright (c) 2006-2010 Paul Duncan <pabs@pablotron.org> (Wirble)
 Portions Copyright (c) 2009-2010 Jens Wille <jens.wille@gmail.com> (Wirble)
 Portions Copyright (c) 2006-2010 Giles Bowkett (light background color scheme)
+Portions Copyright (c) 2006-2010 Revieworld Ltd. <http://github.com/floehopper/mocha> (class/address object inspect)
 
 This software is available under the Ruby license:
 
