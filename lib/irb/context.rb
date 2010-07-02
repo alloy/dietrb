@@ -5,7 +5,7 @@
 # Copyright (C) 2009-2010, Eloy Duran <eloy.de.enige@gmail.com>
 
 require 'irb/formatter'
-require 'readline'
+require 'irb/io/readline'
 
 module IRB
   class Context
@@ -27,12 +27,15 @@ module IRB
     end
     
     attr_reader :object, :binding, :line, :source, :processors
+    attr_accessor :io
     
     def initialize(object, explicit_binding = nil)
       @object  = object
       @binding = explicit_binding || object.instance_eval { binding }
       @line    = 1
       clear_buffer
+      
+      @io = IRB::IO::Readline.new
       
       @underscore_assigner = __evaluate__("_ = nil; proc { |val| _ = val }")
       @processors = self.class.processors.map { |processor| processor.new(self) }
@@ -45,26 +48,31 @@ module IRB
     def evaluate(source)
       result = __evaluate__(source.to_s, '(irb)', @line - @source.buffer.size + 1)
       store_result(result)
-      puts formatter.result(result)
+      @io.puts(formatter.result(result))
       result
     rescue Exception => e
       store_exception(e)
-      puts formatter.exception(e)
+      @io.puts(formatter.exception(e))
     end
     
-    # Reads input and passes it to all processors.
-    def readline
-      input = Readline.readline(formatter.prompt(self), true)
-      @processors.each { |processor| input = processor.input(input) }
-      input
-    rescue Interrupt
-      clear_buffer
-      ""
+    # Prints the prompt to, and reads input from, the +@io+ object and passes
+    # it to all processors.
+    #
+    # If the object returned by  is +nil+ the buffer is
+    # cleared. This could, for example, be when the user sends a SIGINT.
+    def readline_from_io
+      if input = @io.readline(formatter.prompt(self))
+        @processors.each { |processor| input = processor.input(input) }
+        input
+      else
+        clear_buffer
+        ""
+      end
     end
     
     def run
       self.class.make_current(self) do
-        while line = readline
+        while line = readline_from_io
           continue = process_line(line)
           break unless continue
         end
@@ -88,7 +96,7 @@ module IRB
       return false if @source.terminate?
       
       if @source.syntax_error?
-        puts formatter.syntax_error(@line, @source.syntax_error)
+        @io.puts(formatter.syntax_error(@line, @source.syntax_error))
         @source.pop
       elsif @source.code_block?
         evaluate(@source)
@@ -100,7 +108,7 @@ module IRB
     end
     
     def input_line(line)
-      puts formatter.prompt(self) + line
+      @io.puts(formatter.prompt(self) + line)
       process_line(line)
     end
     

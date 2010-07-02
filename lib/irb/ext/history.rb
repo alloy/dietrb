@@ -54,7 +54,7 @@ module IRB
       end
       
       start_index.upto(end_index) do |i|
-        puts "#{i}: #{Readline::HISTORY[i]}"
+        @context.io.puts "#{i}: #{Readline::HISTORY[i]}"
       end
     end
     
