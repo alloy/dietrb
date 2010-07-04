@@ -33,16 +33,19 @@ namespace :macruby do
   desc "Merge source into the MacRuby repo"
   task :merge do
     if (repo = ENV['macruby_repo']) && File.exist?(repo)
-      bin = File.join(repo, 'bin/irb')
-      lib = File.join(repo, 'lib')
+      bin  = File.join(repo, 'bin/irb')
+      lib  = File.join(repo, 'lib')
+      spec = File.join(repo, 'spec/dietrb')
       
-      rm_f bin
-      rm_f File.join(lib, 'irb.rb')
+      rm_f  bin
+      rm_f  File.join(lib, 'irb.rb')
       rm_rf File.join(lib, 'irb')
+      rm_rf spec
       
-      cp 'bin/dietrb', bin
-      cp 'lib/irb.rb', lib
-      cp_r 'lib/irb', lib
+      cp   'bin/dietrb', bin
+      cp   'lib/irb.rb', lib
+      cp_r 'lib/irb',    lib
+      cp_r 'spec',       spec
     else
       puts "[!] Set the `macruby_repo' env variable to point to the MacRuby repo checkout"
       exit 1
