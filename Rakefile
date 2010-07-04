@@ -7,7 +7,7 @@ task :default => :run
 
 desc "Run the specs (run it with a rake installed on the Ruby version you want to run the specs on)"
 task :spec do
-  sh "#{ruby_bin} -r #{FileList['./spec/**/*_spec.rb'].join(' -r ')} -e ''"
+  sh "mspec -t #{ruby_bin} spec"
 end
 
 desc "Run dietrb"
@@ -50,19 +50,20 @@ namespace :macruby do
   end
 end
 
-begin
-  require 'jeweler'
-  require File.expand_path('../lib/irb/version', __FILE__)
-  Jeweler::Tasks.new do |gemspec|
-    gemspec.name = "dietrb"
-    gemspec.version = IRB::VERSION::STRING
-    gemspec.summary = gemspec.description = "IRB on a diet, for MacRuby / Ruby 1.9"
-    gemspec.email = "eloy.de.enige@gmail.com"
-    gemspec.homepage = "http://github.com/alloy/dietrb"
-    gemspec.authors = ["Eloy Duran"]
-    
-    gemspec.required_ruby_version = ::Gem::Requirement.new("~> 1.9")
-    gemspec.files.reject! { |file| file =~ /^(extensions|\.gitignore)/ }
-  end
-rescue LoadError
-end
+# begin
+#   require 'rubygems'
+#   require 'jeweler'
+#   require File.expand_path('../lib/irb/version', __FILE__)
+#   Jeweler::Tasks.new do |gemspec|
+#     gemspec.name = "dietrb"
+#     gemspec.version = IRB::VERSION::STRING
+#     gemspec.summary = gemspec.description = "IRB on a diet, for MacRuby / Ruby 1.9"
+#     gemspec.email = "eloy.de.enige@gmail.com"
+#     gemspec.homepage = "http://github.com/alloy/dietrb"
+#     gemspec.authors = ["Eloy Duran"]
+#     
+#     gemspec.required_ruby_version = ::Gem::Requirement.new("~> 1.9")
+#     gemspec.files.reject! { |file| file =~ /^(extensions|\.gitignore)/ }
+#   end
+# rescue LoadError
+# end

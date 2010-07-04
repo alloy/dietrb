@@ -1,11 +1,13 @@
 require File.expand_path('../spec_helper', __FILE__)
 require "tempfile"
 
-describe "IRB::History" do
-  it "stores the history by default in ~/.irb_history" do
+describe "IRB::History, by default," do
+  it "stores the history in ~/.irb_history" do
     IRB::History.file.should == File.expand_path("~/.irb_history")
   end
-  
+end
+
+describe "IRB::History" do
   before do
     @file = Tempfile.new("irb_history.txt")
     IRB::History.file = @file.path
@@ -39,10 +41,10 @@ describe "IRB::History" do
     FileUtils.rm(@file.path)
     
     @history.to_a.should == []
-    File.should.not.exist @file.path
+    File.exist?(@file.path).should == false
     
     @history.input "puts :ok"
-    File.should.exist @file.path
+    File.exist?(@file.path).should == true
     @history.to_a.should == ["puts :ok"]
   end
   
@@ -63,8 +65,8 @@ describe "IRB::History" do
     @history.input "foo(x)"
     @history.clear!
     
-    @file.rewind; @file.read.should.be.empty
-    Readline::HISTORY.to_a.should.be.empty
+    @file.rewind; @file.read.should == ""
+    Readline::HISTORY.to_a.should == []
   end
 end
 
@@ -89,11 +91,13 @@ class IRB::History
   end
 end
 
-describe "IRB::History, concerning the user api" do
-  it "shows by default a maximum of 50 history entries" do
+describe "IRB::History, concerning the user api, by default," do
+  it "shows a maximum of 50 history entries" do
     IRB::History.max_entries_in_overview.should == 50
   end
-  
+end
+
+describe "IRB::History, concerning the user api," do
   before do
     sources = [
       "puts :ok",
@@ -178,6 +182,6 @@ describe "IRB::History, concerning the user api" do
   
   it "clears the history and history file" do
     clear_history!
-    @history.should.be.cleared
+    @history.cleared?.should == true
   end
 end

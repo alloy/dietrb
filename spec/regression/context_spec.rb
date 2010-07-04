@@ -11,6 +11,6 @@ describe "IRB::Context, when evaluating source" do
   
   it "does not assign the result to the `_' variable in one go, so it doesn't show up in a syntax error" do
     @context.evaluate("'banana;")
-    @context.printed.should.not.include "_ = ('banana;)"
+    @context.printed.should_not include("_ = ('banana;)")
   end
 end

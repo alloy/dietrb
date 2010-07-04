@@ -68,7 +68,7 @@ describe "IRB::Formatter" do
     def object.__id__; 2158110700; end
     
     @formatter.result(object).should == "=> #<Object:0x101444fd8>"
-    object.instance_variable_get(:@inspected).should.not == true
+    object.instance_variable_get(:@inspected).should_not == true
   end
   
   it "prints that a syntax error occurred on the last line and reset the buffer to the previous line" do

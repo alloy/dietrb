@@ -41,12 +41,12 @@ describe "IRB::Context" do
   it "initializes with an object and an explicit binding" do
     context = IRB::Context.new(Object.new, TOPLEVEL_BINDING)
     eval("class InTopLevel; end", context.binding)
-    lambda { ::InTopLevel }.should.not.raise NameError
+    lambda { ::InTopLevel }.should_not raise_error(NameError)
   end
   
   it "initializes with an 'empty' state" do
     @context.line.should == 1
-    @context.source.should.be.instance_of IRB::Source
+    @context.source.class.should == IRB::Source
     @context.source.to_s.should == ""
   end
   
@@ -55,14 +55,14 @@ describe "IRB::Context" do
     begin
       IRB::Context.processors << TestProcessor
       @context = IRB::Context.new(main)
-      @context.processors.last.should.be.instance_of TestProcessor
+      @context.processors.last.class.should == TestProcessor
     ensure
       IRB::Context.processors.replace(before)
     end
   end
   
   it "does not use the same binding copy of the top level object" do
-    lambda { eval("x", @context.binding) }.should.raise NameError
+    lambda { eval("x", @context.binding) }.should raise_error(NameError)
   end
   
   it "makes itself the current running context during the runloop and resigns once it's done" do
@@ -109,28 +109,28 @@ describe "IRB::Context, when evaluating source" do
     lambda {
       @context.evaluate("DoesNotExist")
       @context.evaluate("raise Exception")
-    }.should.not.raise
+    }.should_not.raise_error
   end
   
   it "assigns the last raised exception to the global variable `$EXCEPTION' / `$e'" do
     @context.evaluate("DoesNotExist")
-    $EXCEPTION.should.be.instance_of NameError
-    $EXCEPTION.message.should.include 'DoesNotExist'
+    $EXCEPTION.class.should == NameError
+    $EXCEPTION.message.should include('DoesNotExist')
     $e.should == $EXCEPTION
   end
   
   it "prints the exception that occurs" do
     @context.evaluate("DoesNotExist")
-    @context.printed.should.match /^NameError:.+DoesNotExist/
+    @context.printed.should =~ /^NameError:.+DoesNotExist/
   end
   
   it "uses the line number of the *first* line in the buffer, for the line parameter of eval" do
     @context.process_line("DoesNotExist")
-    @context.printed.should.match /\(irb\):1:in/
+    @context.printed.should =~ /\(irb\):1:in/
     @context.process_line("class A")
     @context.process_line("DoesNotExist")
     @context.process_line("end")
-    @context.printed.should.match /\(irb\):3:in.+\(irb\):2:in/m
+    @context.printed.should =~ /\(irb\):3:in.+\(irb\):2:in/m
   end
   
   it "inputs a line to be processed, skipping readline" do
@@ -181,7 +181,7 @@ describe "IRB::Context, when receiving input" do
         end
       end
       
-      lambda { @context.run }.should.not.raise Interrupt
+      lambda { @context.run }.should_not raise_error(Interrupt)
       @context.source.to_s.should == ""
     ensure
       stub_Readline
@@ -230,7 +230,7 @@ describe "IRB::Context, when receiving input" do
     Readline.stub_input("quit", "def foo")
     def @context.process_line(line); @received = line; super; end
     @context.run
-    @context.instance_variable_get(:@received).should.not == "def foo"
+    @context.instance_variable_get(:@received).should_not == "def foo"
   end
 end
 

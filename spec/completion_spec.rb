@@ -15,8 +15,6 @@ module CompletionHelper
   end
 end
 
-Bacon::Context.send(:include, CompletionHelper)
-
 class CompletionStub
   def self.a_cmethod
   end
@@ -35,6 +33,8 @@ end
 $a_completion_stub = CompletionStub.new
 
 describe "IRB::Completion" do
+  extend CompletionHelper
+  
   before do
     @context = IRB::Context.new(Playground.new)
   end
@@ -51,7 +51,7 @@ describe "IRB::Completion" do
           complete('foo.').should == imethods(::CompletionStub, 'foo')
           
           @context.__evaluate__('def foo.singleton_method; end')
-          complete('foo.').should.include('foo.singleton_method')
+          complete('foo.').should include('foo.singleton_method')
         end
         
         it "matches as a global variable" do
@@ -231,7 +231,7 @@ describe "IRB::Completion" do
   it "completes reserved words as variables or constants" do
     (IRB::Completion::RESERVED_DOWNCASE_WORDS +
       IRB::Completion::RESERVED_UPCASE_WORDS).each do |word|
-      complete(word[0..-2]).should.include word
+      complete(word[0..-2]).should include(word)
     end
   end
 end

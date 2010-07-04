@@ -1,9 +1,5 @@
 require File.expand_path('../spec_helper', __FILE__)
 
-class Should
-  alias have be
-end
-
 describe "IRB::Source" do
   before do
     @source = IRB::Source.new
@@ -51,7 +47,7 @@ describe "IRB::Source" do
       ["def foo", "p :ok", "end"],
       ["class A; def", "foo(x); p x", "end; end"]
     ].each do |buffer|
-      IRB::Source.new(buffer).should.be.code_block
+      IRB::Source.new(buffer).code_block?.should == true
     end
   end
   
@@ -60,16 +56,16 @@ describe "IRB::Source" do
       ["def foo", "p :ok"],
       ["class A; def", "foo(x); p x", "end"]
     ].each do |buffer|
-      IRB::Source.new(buffer).should.not.be.code_block
+      IRB::Source.new(buffer).code_block?.should == false
     end
   end
   
   it "returns whether or not the accumulated source contains a syntax error" do
-    @source.should.not.have.syntax_error
+    @source.syntax_error?.should == false
     @source << "def foo"
-    @source.should.not.have.syntax_error
+    @source.syntax_error?.should == false
     @source << "  def;"
-    @source.should.have.syntax_error
+    @source.syntax_error?.should == true
   end
   
   it "returns the current code block indentation level" do
@@ -102,7 +98,7 @@ describe "IRB::Source" do
     @source << "end"
     @source.level
     new_reflection = @source.reflect
-    new_reflection.should.not == reflection
+    new_reflection.should_not == reflection
     @source.code_block?
     @source.reflect.should == new_reflection
     
@@ -111,7 +107,7 @@ describe "IRB::Source" do
     @source.pop
     @source.level
     new_reflection = @source.reflect
-    new_reflection.should.not == reflection
+    new_reflection.should_not == reflection
     @source.syntax_error?
     @source.reflect.should == new_reflection
   end
@@ -123,32 +119,32 @@ describe "IRB::Source::Reflector" do
   end
   
   it "returns whether or not the source is a valid code block" do
-    reflect("def foo").should.not.be.code_block
-    reflect("def foo; p :ok").should.not.be.code_block
-    reflect("def foo; p :ok; end").should.be.code_block
+    reflect("def foo").code_block?.should == false
+    reflect("def foo; p :ok").code_block?.should == false
+    reflect("def foo; p :ok; end").code_block?.should == true
     
-    reflect("if true").should.not.be.code_block
-    reflect("p :ok if true").should.be.code_block
+    reflect("if true").code_block?.should == false
+    reflect("p :ok if true").code_block?.should == true
   end
 
   it "returns whether or not the current session should be terminated" do
-    reflect("exit").should.terminate
-    reflect("quit").should.terminate
-    reflect("def foo; end; exit").should.terminate
-    reflect("def foo; end; quit").should.terminate
+    reflect("exit").terminate?.should == true
+    reflect("quit").terminate?.should == true
+    reflect("def foo; end; exit").terminate?.should == true
+    reflect("def foo; end; quit").terminate?.should == true
 
-    reflect("def foo; exit; end").should.not.terminate
-    reflect("def foo; quit; end").should.not.terminate
+    reflect("def foo; exit; end").terminate?.should == false
+    reflect("def foo; quit; end").terminate?.should == false
   end
   
   it "returns whether or not the source contains a syntax error, except a code block not ending" do
-    reflect("def;").should.have.syntax_error
-    reflect("def;").should.have.syntax_error
-    reflect("def foo").should.not.have.syntax_error
-    reflect("class A; }").should.have.syntax_error
-    reflect("class A; {" ).should.not.have.syntax_error
-    reflect("class A def foo").should.have.syntax_error
-    reflect("class A; def foo" ).should.not.have.syntax_error
+    reflect("def;").syntax_error?.should == true
+    reflect("def;").syntax_error?.should == true
+    reflect("def foo").syntax_error?.should == false
+    reflect("class A; }").syntax_error?.should == true
+    reflect("class A; {" ).syntax_error?.should == false
+    reflect("class A def foo").syntax_error?.should == true
+    reflect("class A; def foo" ).syntax_error?.should == false
   end
   
   it "returns the actual syntax error message if one occurs" do
