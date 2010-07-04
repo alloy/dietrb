@@ -1,22 +1,6 @@
 require File.expand_path('../spec_helper', __FILE__)
 require 'tempfile'
 
-def stub_Readline
-  class << Readline
-    attr_reader :received
-    
-    def stub_input(*input)
-      @input = input
-    end
-    
-    def readline(prompt, history)
-      @received = [prompt, history]
-      @input.shift
-    end
-  end
-end
-stub_Readline
-
 class TestProcessor
   def input(s)
     s * 2
@@ -28,6 +12,7 @@ main = self
 describe "IRB::Context" do
   before do
     @context = IRB::Context.new(main)
+    @context.io = @io = CaptureIO.new
   end
   
   it "initializes with an object and stores a copy of its binding" do
@@ -65,22 +50,21 @@ describe "IRB::Context" do
     lambda { eval("x", @context.binding) }.should raise_error(NameError)
   end
   
-  # it "makes itself the current running context during the runloop and resigns once it's done" do
-  #   IRB::Context.current.should == nil
-  #   
-  #   Readline.stub_input("current_during_run = IRB::Context.current")
-  #   @context.run
-  #   eval('current_during_run', @context.binding).should == @context
-  #   
-  #   IRB::Context.current.should == nil
-  # end
+  it "makes itself the current running context during the runloop and resigns once it's done" do
+    IRB::Context.current.should == nil
+    
+    @io.stub_input("current_during_run = IRB::Context.current")
+    @context.run
+    eval('current_during_run', @context.binding).should == @context
+    
+    IRB::Context.current.should == nil
+  end
 end
 
 describe "IRB::Context, when evaluating source" do
   before do
     @context = IRB::Context.new(main)
-    def @context.printed;      @printed ||= ''          end
-    def @context.puts(string); printed << "#{string}\n" end
+    @context.io = @io = CaptureIO.new
     IRB.formatter = IRB::Formatter.new
   end
   
@@ -90,7 +74,7 @@ describe "IRB::Context, when evaluating source" do
   
   it "prints the result" do
     @context.evaluate("Hash[:foo, :foo]")
-    @context.printed.should == "=> {:foo=>:foo}\n"
+    @io.printed.should == "=> {:foo=>:foo}\n"
   end
   
   it "assigns the result to the local variable `_'" do
@@ -121,44 +105,45 @@ describe "IRB::Context, when evaluating source" do
   
   it "prints the exception that occurs" do
     @context.evaluate("DoesNotExist")
-    @context.printed.should =~ /^NameError:.+DoesNotExist/
+    @io.printed.should =~ /^NameError:.+DoesNotExist/
   end
   
   it "uses the line number of the *first* line in the buffer, for the line parameter of eval" do
     @context.process_line("DoesNotExist")
-    @context.printed.should =~ /\(irb\):1:in/
+    @io.printed.should =~ /\(irb\):1:in/
     @context.process_line("class A")
     @context.process_line("DoesNotExist")
     @context.process_line("end")
-    @context.printed.should =~ /\(irb\):3:in.+\(irb\):2:in/m
+    @io.printed.should =~ /\(irb\):3:in.+\(irb\):2:in/m
   end
   
   it "inputs a line to be processed, skipping readline" do
     expected = "#{@context.formatter.prompt(@context)}2 * 21\n=> 42\n"
     @context.input_line("2 * 21")
-    @context.printed.should == expected
+    @io.printed.should == expected
   end
 end
 
 describe "IRB::Context, when receiving input" do
   before do
     @context = IRB::Context.new(main)
+    @context.io = @io = CaptureIO.new
   end
   
-  it "prints the prompt, reads a line, saves it to the history and returns it" do
-    Readline.stub_input("def foo")
-    @context.readline.should == "def foo"
-    Readline.received.should == ["irb(main):001:0> ", true]
+  it "prints the prompt and reads a line" do
+    @io.stub_input("def foo")
+    @context.readline_from_io.should == "def foo"
+    @io.printed.should == "irb(main):001:0> "
   end
   
   it "passes the input to all processors, which may return a new value" do
     @context.processors << TestProcessor.new
-    Readline.stub_input("foo")
-    @context.readline.should == "foofoo"
+    @io.stub_input("foo")
+    @context.readline_from_io.should == "foofoo"
   end
   
   it "processes the output" do
-    Readline.stub_input("def foo")
+    @io.stub_input("def foo")
     def @context.process_line(line); @received = line; false; end
     @context.run
     @context.instance_variable_get(:@received).should == "def foo"
@@ -170,23 +155,19 @@ describe "IRB::Context, when receiving input" do
     @context.source.to_s.should == "def foo\np :ok"
   end
   
-  # it "clears the source buffer when an Interrupt signal is received" do
-  #   begin
-  #     @context.process_line("def foo")
-  #     
-  #     def Readline.readline(*args)
-  #       unless @raised
-  #         @raised = true
-  #         raise Interrupt
-  #       end
-  #     end
-  #     
-  #     lambda { @context.run }.should_not raise_error(Interrupt)
-  #     @context.source.to_s.should == ""
-  #   ensure
-  #     stub_Readline
-  #   end
-  # end
+  it "clears the source buffer when an Interrupt signal is received" do
+    @context.process_line("def foo")
+    
+    def @io.readline(prompt)
+      unless @raised
+        @raised = true
+        raise Interrupt
+      end
+    end
+    
+    lambda { @context.run }.should_not raise_error(Interrupt)
+    @context.source.to_s.should == ""
+  end
   
   it "increases the current line number" do
     @context.line.should == 1
@@ -208,14 +189,11 @@ describe "IRB::Context, when receiving input" do
   end
   
   it "prints that a syntax error occurred on the last line and reset the buffer to the previous line" do
-    def @context.puts(str); @printed = str; end
-    
     @context.process_line("def foo")
     @context.process_line("  };")
     
     @context.source.to_s.should == "def foo"
-    printed = @context.instance_variable_get(:@printed)
-    printed.should == "SyntaxError: compile error\n(irb):2: syntax error, unexpected '}'"
+    @io.printed.should == "SyntaxError: compile error\n(irb):2: syntax error, unexpected '}'\n"
   end
   
   it "returns whether or not the runloop should continue, but only if the level is 0" do
@@ -227,7 +205,7 @@ describe "IRB::Context, when receiving input" do
   end
   
   it "exits the runloop if the user wishes so" do
-    Readline.stub_input("quit", "def foo")
+    @io.stub_input("quit", "def foo")
     def @context.process_line(line); @received = line; super; end
     @context.run
     @context.instance_variable_get(:@received).should_not == "def foo"

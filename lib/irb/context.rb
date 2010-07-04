@@ -58,16 +58,14 @@ module IRB
     # Prints the prompt to, and reads input from, the +@io+ object and passes
     # it to all processors.
     #
-    # If the object returned by  is +nil+ the buffer is
-    # cleared. This could, for example, be when the user sends a SIGINT.
+    # The buffer is cleared if an Interrupt exception is raised.
     def readline_from_io
-      if input = @io.readline(formatter.prompt(self))
-        @processors.each { |processor| input = processor.input(input) }
-        input
-      else
-        clear_buffer
-        ""
-      end
+      input = @io.readline(formatter.prompt(self))
+      @processors.each { |processor| input = processor.input(input) }
+      input
+    rescue Interrupt
+      clear_buffer
+      ""
     end
     
     def run

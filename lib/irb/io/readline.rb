@@ -10,7 +10,6 @@ module IRB
       
       def readline(prompt)
         ::Readline.readline(prompt, true)
-      rescue Interrupt
       end
       
       def puts(*args)

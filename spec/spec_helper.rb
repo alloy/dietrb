@@ -15,3 +15,26 @@ end
 $:.unshift File.join(ROOT, 'lib')
 
 require 'irb'
+
+class CaptureIO
+  def printed
+    @printed ||= ''
+  end
+  
+  def print(string)
+    printed << string
+  end
+  
+  def puts(string)
+    print "#{string}\n"
+  end
+  
+  def stub_input(*input)
+    @input = input
+  end
+  
+  def readline(prompt)
+    print prompt
+    @input.shift
+  end
+end

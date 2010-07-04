@@ -71,21 +71,10 @@ describe "IRB::History" do
 end
 
 class IRB::History
-  def printed
-    @printed ||= ""
-  end
-  
-  def print(s)
-    printed << s
-  end
-  
-  def puts(s)
-    printed << "#{s}\n"
-  end
-  
   def clear!
     @cleared = true
   end
+  
   def cleared?
     @cleared
   end
@@ -116,6 +105,7 @@ describe "IRB::History, concerning the user api," do
     IRB::History.max_entries_in_overview = 5
     
     @context = IRB::Context.new(Object.new)
+    @context.io = @io = CaptureIO.new
     IRB::Context.current = @context
     
     @history = @context.processors.find { |p| p.is_a?(IRB::History) }
@@ -129,10 +119,10 @@ describe "IRB::History, concerning the user api," do
     history.should == nil
   end
   
-  it "prints a formatted list with, by default IRB::History.max_entries_in_overview, number of history entries" do
+  it "prints a formatted list with IRB::History.max_entries_in_overview number of history entries" do
     history
     
-    @history.printed.should == %{
+    @io.printed.should == %{
 2: class AAA
 3:   def bar
 4:     :ok
@@ -144,7 +134,7 @@ describe "IRB::History, concerning the user api," do
   it "prints a formatted list of N most recent history entries" do
     history(7)
     
-    @history.printed.should == %{
+    @io.printed.should == %{
 0: puts :ok
 1: x = foo(x)
 2: class AAA
@@ -158,7 +148,7 @@ describe "IRB::History, concerning the user api," do
   it "prints a formatted list of all history entries if the request number of entries is more than there is" do
     history(777)
 
-    @history.printed.should == %{
+    @io.printed.should == %{
 0: puts :ok
 1: x = foo(x)
 2: class AAA
