@@ -65,15 +65,15 @@ describe "IRB::Context" do
     lambda { eval("x", @context.binding) }.should raise_error(NameError)
   end
   
-  it "makes itself the current running context during the runloop and resigns once it's done" do
-    IRB::Context.current.should == nil
-    
-    Readline.stub_input("current_during_run = IRB::Context.current")
-    @context.run
-    eval('current_during_run', @context.binding).should == @context
-    
-    IRB::Context.current.should == nil
-  end
+  # it "makes itself the current running context during the runloop and resigns once it's done" do
+  #   IRB::Context.current.should == nil
+  #   
+  #   Readline.stub_input("current_during_run = IRB::Context.current")
+  #   @context.run
+  #   eval('current_during_run', @context.binding).should == @context
+  #   
+  #   IRB::Context.current.should == nil
+  # end
 end
 
 describe "IRB::Context, when evaluating source" do
@@ -170,23 +170,23 @@ describe "IRB::Context, when receiving input" do
     @context.source.to_s.should == "def foo\np :ok"
   end
   
-  it "clears the source buffer when an Interrupt signal is received" do
-    begin
-      @context.process_line("def foo")
-      
-      def Readline.readline(*args)
-        unless @raised
-          @raised = true
-          raise Interrupt
-        end
-      end
-      
-      lambda { @context.run }.should_not raise_error(Interrupt)
-      @context.source.to_s.should == ""
-    ensure
-      stub_Readline
-    end
-  end
+  # it "clears the source buffer when an Interrupt signal is received" do
+  #   begin
+  #     @context.process_line("def foo")
+  #     
+  #     def Readline.readline(*args)
+  #       unless @raised
+  #         @raised = true
+  #         raise Interrupt
+  #       end
+  #     end
+  #     
+  #     lambda { @context.run }.should_not raise_error(Interrupt)
+  #     @context.source.to_s.should == ""
+  #   ensure
+  #     stub_Readline
+  #   end
+  # end
   
   it "increases the current line number" do
     @context.line.should == 1
@@ -234,11 +234,11 @@ describe "IRB::Context, when receiving input" do
   end
 end
 
-describe "Kernel::irb" do
-  it "creates a new context for the given object and runs it" do
-    Readline.stub_input("::IRBRan = self")
-    o = Object.new
-    irb(o)
-    IRBRan.should == o
-  end
-end
+# describe "Kernel::irb" do
+#   it "creates a new context for the given object and runs it" do
+#     Readline.stub_input("::IRBRan = self")
+#     o = Object.new
+#     irb(o)
+#     IRBRan.should == o
+#   end
+# end
