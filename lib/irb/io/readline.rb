@@ -3,6 +3,8 @@ require 'readline'
 module IRB
   module IO
     class Readline
+      attr_reader :input, :output
+      
       def initialize(input = $stdin, output = $stdout)
         ::Readline.input  = @input  = input
         ::Readline.output = @output = output
