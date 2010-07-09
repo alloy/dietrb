@@ -5,14 +5,16 @@
 # Copyright (C) 2009-2010, Eloy Duran <eloy.de.enige@gmail.com>
 
 require 'irb/context'
-require 'irb/io'
+
+# require 'irb/io'
+# require 'irb/driver/tty'
+# require 'irb/driver/readline'
+require 'irb/driver/socket'
+
 require 'irb/source'
 require 'irb/version'
 
 require 'irb/deprecated'
-
-require 'irb/ext/history'
-require 'irb/ext/completion'
 
 # if !ENV['SPECCING'] && defined?(RUBY_ENGINE) && RUBY_ENGINE == "macruby"
 #   require 'irb/ext/macruby'

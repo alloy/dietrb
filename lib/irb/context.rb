@@ -28,7 +28,8 @@ module IRB
     attr_reader :object, :binding, :line, :source, :processors
     attr_accessor :io, :formatter
     
-    def initialize(object, explicit_binding = nil)
+    def initialize(driver, object, explicit_binding = nil)
+      @driver  = driver
       @object  = object
       @binding = explicit_binding || object.instance_eval { binding }
       @line    = 1
@@ -56,23 +57,23 @@ module IRB
     # it to all processors.
     #
     # The buffer is cleared if an Interrupt exception is raised.
-    def readline_from_io
-      input = io.readline(formatter.prompt(self))
-      @processors.each { |processor| input = processor.input(input) }
-      input
-    rescue Interrupt
-      clear_buffer
-      ""
-    end
+    # def readline_from_io
+    #   input = io.readline(formatter.prompt(self))
+    #   @processors.each { |processor| input = processor.input(input) }
+    #   input
+    # rescue Interrupt
+    #   clear_buffer
+    #   ""
+    # end
     
-    def run
-      self.class.make_current(self) do
-        while line = readline_from_io
-          continue = process_line(line)
-          break unless continue
-        end
-      end
-    end
+    # def run
+    #   self.class.make_current(self) do
+    #     while line = readline_from_io
+    #       continue = process_line(line)
+    #       break unless continue
+    #     end
+    #   end
+    # end
     
     # Returns whether or not the user wants to continue the current runloop.
     # This can only be done at a code block indentation level of 0.
@@ -87,6 +88,9 @@ module IRB
     #
     #   process_line("quit") # => false
     def process_line(line)
+      # TODO spec
+      @processors.each { |processor| line = processor.input(line) }
+      
       @source << line
       return false if @source.terminate?
       
@@ -102,6 +106,10 @@ module IRB
       true
     end
     
+    def prompt
+      formatter.prompt(self)
+    end
+    
     def input_line(line)
       io.puts(formatter.prompt(self) + line)
       process_line(line)
@@ -112,7 +120,8 @@ module IRB
     end
     
     def io
-      @io ||= IRB.io
+      # @io ||= IRB.io
+      @driver
     end
     
     def clear_buffer
@@ -129,11 +138,11 @@ module IRB
   end
 end
 
-module Kernel
-  # Creates a new IRB::Context with the given +object+ and runs it.
-  def irb(object, binding = nil)
-    IRB::Context.new(object, binding).run
-  end
-  
-  private :irb
-end
+# module Kernel
+#   # Creates a new IRB::Context with the given +object+ and runs it.
+#   def irb(object, binding = nil)
+#     IRB::Context.new(object, binding).run
+#   end
+#   
+#   private :irb
+# end
