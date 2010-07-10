@@ -1,25 +1,4 @@
 module IRB
-  # class Context
-  #   class << self
-  #     # attr_accessor :current
-  #     def current
-  #       Thread.current[:context]
-  #     end
-  #     
-  #     def current=(context)
-  #       Thread.current[:context] = context
-  #     end
-  #     
-  #     # TODO move into driver
-  #     # def make_current(context)
-  #     #   before, self.current = self.current, context
-  #     #   yield
-  #     # ensure
-  #     #   self.current = before
-  #     # end
-  #   end
-  # end
-  
   class << self
     attr_accessor :driver_class
     
@@ -36,7 +15,6 @@ module IRB
             break if driver = thread[:irb_driver]
           end
         end
-        p driver
         driver || driver_class.new
       end
     end
@@ -102,16 +80,16 @@ module IRB
         @thread_group.add(Thread.current)
       end
       
-      def readline
-        @output.print(current_context.prompt)
+      def readline(context)
+        @output.print(context.prompt)
         @input.gets
       end
       
       # TODO make it take the current context instead of storing it
-      def consume
-        readline
+      def consume(context)
+        readline(context)
       rescue Interrupt
-        current_context.clear_buffer
+        context.clear_buffer
         ""
       end
       
@@ -126,21 +104,12 @@ module IRB
       
       def run(context)
         ensure_output_redirector do
-          make_current(context) do
-            while line = consume
-              continue = context.process_line(line)
-              break unless continue
-            end
+          context.driver = self
+          while line = consume(context)
+            continue = context.process_line(line)
+            break unless continue
           end
         end
-      end
-      
-      def make_current(context)
-        context.driver = self
-        before, self.current_context = self.current_context, context
-        yield
-      ensure
-        self.current_context = before
       end
       
       # Ensure that the standard output object is a OutputRedirector. If it's

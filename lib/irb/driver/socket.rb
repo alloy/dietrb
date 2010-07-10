@@ -1,4 +1,3 @@
-# require 'irb/driver/readline'
 require 'irb/driver/tty'
 require 'socket'
 

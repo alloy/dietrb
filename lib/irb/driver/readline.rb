@@ -10,9 +10,12 @@ module IRB
         super
         ::Readline.input  = @input
         ::Readline.output = @output
+        ::Readline.completion_proc = IRB::Completion.new
       end
       
-      def readline
+      # Assigns a context to the completion object and waits for input.
+      def readline(context)
+        ::Readline.completion_proc.context = context
         ::Readline.readline(context.prompt, true)
       end
     end

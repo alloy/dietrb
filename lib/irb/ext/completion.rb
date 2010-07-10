@@ -36,18 +36,28 @@ module IRB
       yield
     }
     
-    # Returns an array of possible completion results, with the current
-    # IRB::Context.
-    #
-    # This is meant to be used with Readline which takes a completion proc.
-    def self.call(source)
-      new(IRB::Context.current, source).results
+    # # Returns an array of possible completion results, with the current
+    # # IRB::Context.
+    # #
+    # # This is meant to be used with Readline which takes a completion proc.
+    # def self.call(source)
+    #   new(IRB::Context.current, source).results
+    # end
+    
+    attr_reader :source
+    attr_accessor :context
+    
+    # def initialize(context, source)
+    #   @context, @source = context, source
+    # end
+    
+    def initialize(context = nil)
+      @context = context
     end
     
-    attr_reader :context, :source
-    
-    def initialize(context, source)
-      @context, @source = context, source
+    def call(source)
+      @source = source
+      results
     end
     
     def evaluate(s)
@@ -190,5 +200,5 @@ if defined?(Readline)
     # * Hash: = and >
     Readline.basic_word_break_characters= " \t\n`<;|&("
   end
-  Readline.completion_proc = IRB::Completion
+  # Readline.completion_proc = IRB::Completion
 end

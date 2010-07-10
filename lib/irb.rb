@@ -8,8 +8,8 @@ require 'irb/context'
 
 # require 'irb/io'
 # require 'irb/driver/tty'
-# require 'irb/driver/readline'
-require 'irb/driver/socket'
+require 'irb/driver/readline'
+# require 'irb/driver/socket'
 
 require 'irb/source'
 require 'irb/version'
