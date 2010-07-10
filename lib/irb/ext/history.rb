@@ -10,16 +10,33 @@ module IRB
   class History
     class << self
       attr_accessor :file, :max_entries_in_overview
+    end
+    
+    module HistoryExtension
+      attr_accessor :irb_history
       
-      def current
-        IRB::Context.current.processors.find do |processor|
-          processor.is_a?(IRB::History)
-        end
+      def history(number_of_entries = IRB::History.max_entries_in_overview)
+        @irb_history.history(number_of_entries)
+        nil
+      end
+      alias_method :h, :history
+      
+      def history!(entry_or_range)
+        @irb_history.history!(entry_or_range)
+        nil
+      end
+      alias_method :h!, :history!
+      
+      def clear_history!
+        @irb_history.clear!
+        nil
       end
     end
     
     def initialize(context)
       @context = context
+      @context.object.extend(HistoryExtension)
+      @context.object.irb_history = self
       
       to_a.each do |source|
         Readline::HISTORY.push(source)
@@ -70,25 +87,6 @@ module IRB
         @context.input_line(Readline::HISTORY[entry_or_range])
       end
     end
-  end
-end
-
-module Kernel
-  def history(number_of_entries = IRB::History.max_entries_in_overview)
-    IRB::History.current.history(number_of_entries)
-    nil
-  end
-  alias_method :h, :history
-  
-  def history!(entry_or_range)
-    IRB::History.current.history!(entry_or_range)
-    nil
-  end
-  alias_method :h!, :history!
-  
-  def clear_history!
-    IRB::History.current.clear!
-    nil
   end
 end
 
