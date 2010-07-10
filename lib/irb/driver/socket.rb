@@ -2,34 +2,54 @@
 require 'irb/driver/tty'
 require 'socket'
 
-TOPLEVEL_OBJECT = self
-
 module IRB
   module Driver
+    class SocketTTY < TTY
+      # We don't want to put the real standard output object on the
+      # OutputRedirector target stack.
+      def assign_output_redirector!
+        before  = $stdout
+        $stdout = IRB::Driver::OutputRedirector.new
+        before
+      end
+    end
+    
     class Socket
-      # DEFAULTS = {
-      #   :tty_exit_on_eof => false,
-      #   :term => "\r\0"
-      # }
-      
-      def initialize(host = '127.0.0.1', port = 7829)
-        # @options = DEFAULTS.merge(options)
+      # Initializes with the object and binding that each new connection will
+      # get as Context. The binding is shared, so local variables will stay
+      # around. The benefit of this is that a socket based irb session is most
+      # probably used to debug a running application in development. In this
+      # scenario it could be beneficial to keep local vars in between sessions.
+      #
+      # TODO see if that actually works out ok.
+      def initialize(object, binding, host = '127.0.0.1', port = 7829)
+        @object, @binding = object, binding
         @host, @port = host, port
         @server = TCPServer.new(host, port)
       end
       
+      # TODO libedit doesn't use the right input and output, so we can't use Readline for now!!
       def run
         $stderr.puts "[!] Running IRB server on #{@host}:#{@port}"
         loop do
           connection = @server.accept
-          # TODO libedit doesn't use the right input and output!!
-          # IRB.driver = IRB::Driver::Readline.new(connection, connection)
-          IRB.driver = IRB::Driver::TTY.new(connection, connection)
-          context = IRB::Context.new(IRB.driver, TOPLEVEL_OBJECT, TOPLEVEL_BINDING.dup)
-          IRB.driver.run(context)
-          connection.close
+          Thread.new do
+            # assign driver with connection to current thread and start runloop
+            IRB.driver = SocketTTY.new(connection, connection)
+            irb(@object, @binding)
+            connection.close
+          end
         end
       end
     end
+  end
+end
+
+def self.irb(object, binding = nil)
+  unless @server
+    @server = IRB::Driver::Socket.new(object, binding)
+    @server.run
+  else
+    super
   end
 end

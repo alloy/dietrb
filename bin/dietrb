@@ -32,8 +32,8 @@ end
 IRB.formatter.filter_from_backtrace << /^#{__FILE__}/
 
 if ARGV.empty?
-  # irb(self, TOPLEVEL_BINDING.dup)
-  IRB::Driver::Socket.new.run
+  irb(self, TOPLEVEL_BINDING.dup)
+  puts "ENDED! and this message should show up on stdout"
 else
   path = ARGV.shift
   context = IRB::Context.new(self, TOPLEVEL_BINDING.dup)

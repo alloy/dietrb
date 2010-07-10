@@ -12,7 +12,7 @@ end
 
 desc "Run dietrb"
 task :run do
-  sh "#{ruby_bin} -I lib ./bin/dietrb -r irb/ext/colorize -r pp"
+  sh "#{ruby_bin} -I lib ./bin/dietrb -d -r irb/ext/colorize -r pp"
 end
 
 namespace :macruby do

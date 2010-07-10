@@ -9,16 +9,16 @@ require 'irb/formatter'
 module IRB
   class Context
     class << self
-      attr_accessor :current
-      
-      def make_current(context)
-        # Messing with a current context is gonna bite me in the ass when we
-        # get to multi-threading, but we'll it when we get there.
-        before, @current = @current, context
-        yield
-      ensure
-        @current = before
-      end
+      # attr_accessor :current
+      # 
+      # def make_current(context)
+      #   # Messing with a current context is gonna bite me in the ass when we
+      #   # get to multi-threading, but we'll it when we get there.
+      #   before, @current = @current, context
+      #   yield
+      # ensure
+      #   @current = before
+      # end
       
       def processors
         @processors ||= []
@@ -26,10 +26,9 @@ module IRB
     end
     
     attr_reader :object, :binding, :line, :source, :processors
-    attr_accessor :io, :formatter
+    attr_accessor :io, :formatter, :driver
     
-    def initialize(driver, object, explicit_binding = nil)
-      @driver  = driver
+    def initialize(object, explicit_binding = nil)
       @object  = object
       @binding = explicit_binding || object.instance_eval { binding }
       @line    = 1
