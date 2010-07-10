@@ -32,6 +32,7 @@ end
 IRB.formatter.filter_from_backtrace << /^#{__FILE__}/
 
 if ARGV.empty?
+  require 'irb/driver/readline'
   irb(self, TOPLEVEL_BINDING.dup)
   # TODO make sure!
   puts "ENDED! and this message should show up on stdout"
