@@ -1,10 +1,14 @@
 Copyright (c) <2010> Eloy Duran, <eloy.de.enige@gmail.com>
 
-Portions Copyright (c) 2006-2010 Ben Bleything <ben@bleything.net> (history utils)
-Portions Copyright (c) 2006-2010 Paul Duncan <pabs@pablotron.org> (Wirble)
-Portions Copyright (c) 2009-2010 Jens Wille <jens.wille@gmail.com> (Wirble)
-Portions Copyright (c) 2006-2010 Giles Bowkett (light background color scheme)
-Portions Copyright (c) 2006-2010 Revieworld Ltd. <http://github.com/floehopper/mocha> (class/address object inspect)
+Portions Copyright (c):
+* 2006-2010 Ben Bleything <ben@bleything.net> (history utils)
+* 2006-2010 Paul Duncan <pabs@pablotron.org> (Wirble)
+* 2009-2010 Jens Wille <jens.wille@gmail.com> (Wirble)
+* 2006-2010 Giles Bowkett (light background color scheme)
+* 2006-2010 Revieworld Ltd. <http://github.com/floehopper/mocha>
+            (class/address object inspect)
+* 2008-2010 Vincent Isambart <http://github.com/vincentisambart/hotconsole>
+            (Output redirection on different threads)
 
 This software is available under the Ruby license:
 
