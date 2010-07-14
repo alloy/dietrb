@@ -31,7 +31,7 @@ end
 describe "IRB::Driver::OutputRedirector" do
   before :each do
     @driver = StubDriver.new
-    @driver.output = CaptureIO.new
+    @driver.output = OutputStub.new
     IRB::Driver.current = @driver
     
     @redirector = IRB::Driver::OutputRedirector.new

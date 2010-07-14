@@ -23,15 +23,6 @@ module IRB
         ""
       end
       
-      def puts(*args)
-        @output.puts(*args)
-      end
-      
-      def print(*args)
-        @output.print(*args)
-        @output.flush
-      end
-      
       def run(context)
         ensure_output_redirector do
           while line = consume(context)
