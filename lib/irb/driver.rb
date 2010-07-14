@@ -2,6 +2,7 @@ module IRB
   module Driver
     class << self
       def current=(driver)
+        ThreadGroup.new.add(Thread.current)
         Thread.current[:irb_driver] = driver
       end
       

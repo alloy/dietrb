@@ -8,9 +8,6 @@ module IRB
       def initialize(input = $stdin, output = $stdout)
         @input  = input
         @output = output
-        
-        @thread_group = ThreadGroup.new
-        @thread_group.add(Thread.current)
       end
       
       def readline(context)

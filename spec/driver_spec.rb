@@ -20,6 +20,10 @@ describe "IRB::Driver" do
   end
   
   it "returns the same driver for child threads" do
+    Thread.new do
+      IRB::Driver.current = other = StubDriver.new
+      Thread.new { IRB::Driver.current.should == other }.join
+    end.join
     Thread.new { IRB::Driver.current.should == @driver }.join
   end
 end
