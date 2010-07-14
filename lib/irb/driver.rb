@@ -1,27 +1,26 @@
 module IRB
-  class << self
-    attr_accessor :driver_class
-    
-    def driver=(driver)
-      Thread.current[:irb_driver] = driver
-    end
-    
-    def driver
-      current_thread = Thread.current
-      current_thread[:irb_driver] ||= begin
-        if group = current_thread.group
-          group.list.each do |thread|
-            break(driver) if driver = thread[:irb_driver]
+  module Driver
+    class << self
+      def current=(driver)
+        Thread.current[:irb_driver] = driver
+      end
+      
+      def current
+        current_thread = Thread.current
+        current_thread[:irb_driver] ||= begin
+          if group = current_thread.group
+            group.list.each do |thread|
+              driver = thread[:irb_driver]
+              break(driver)
+            end
           end
         end
       end
     end
-  end
-  
-  module Driver
+    
     class OutputRedirector
       def self.target
-        if driver = IRB.driver
+        if driver = IRB::Driver.current
           driver.output
         else
           $stderr

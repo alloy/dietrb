@@ -38,7 +38,7 @@ if ARGV.empty?
 else
   path = ARGV.shift
   require 'irb/driver/file'
-  IRB.driver = IRB::Driver::File.new(path)
+  IRB::Driver.current = IRB::Driver::File.new(path)
 end
 
 irb(self, TOPLEVEL_BINDING.dup)

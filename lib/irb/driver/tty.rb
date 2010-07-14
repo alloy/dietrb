@@ -58,12 +58,12 @@ module IRB
   end
 end
 
-IRB.driver = IRB::Driver::TTY.new
+IRB::Driver.current = IRB::Driver::TTY.new
 
 module Kernel
   # Creates a new IRB::Context with the given +object+ and runs it.
   def irb(object, binding = nil)
-    IRB.driver.run(IRB::Context.new(object, binding))
+    IRB::Driver.current.run(IRB::Context.new(object, binding))
   end
   
   private :irb

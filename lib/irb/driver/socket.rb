@@ -24,7 +24,7 @@ module IRB
           connection = @server.accept
           Thread.new do
             # assign driver with connection to current thread and start runloop
-            IRB.driver = TTY.new(connection, connection)
+            IRB::Driver.current = TTY.new(connection, connection)
             irb(@object, @binding)
             connection.close
           end

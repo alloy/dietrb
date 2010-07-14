@@ -22,4 +22,4 @@ module IRB
   end
 end
 
-IRB.driver = IRB::Driver::Readline.new
+IRB::Driver.current = IRB::Driver::Readline.new

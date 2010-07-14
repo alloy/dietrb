@@ -21,12 +21,16 @@ class CaptureIO
     @printed ||= ''
   end
   
+  def write(string)
+    printed << string
+  end
+  
   def print(string)
     printed << string
   end
   
-  def puts(string)
-    print "#{string}\n"
+  def puts(*args)
+    print "#{args.join("\n")}\n"
   end
   
   def stub_input(*input)
