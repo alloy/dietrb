@@ -15,7 +15,7 @@ module IRB
     end
     
     attr_reader :object, :binding, :line, :source, :processors
-    attr_accessor :driver, :formatter
+    attr_accessor :formatter
     
     def initialize(object, explicit_binding = nil)
       @object  = object
@@ -34,11 +34,11 @@ module IRB
     def evaluate(source)
       result = __evaluate__(source.to_s, '(irb)', @line - @source.buffer.size + 1)
       store_result(result)
-      output.puts(formatter.result(result))
+      puts(formatter.result(result))
       result
     rescue Exception => e
       store_exception(e)
-      output.puts(formatter.exception(e))
+      puts(formatter.exception(e))
     end
     
     # Returns whether or not the user wants to continue the current runloop.
@@ -61,7 +61,7 @@ module IRB
       return false if @source.terminate?
       
       if @source.syntax_error?
-        output.puts(formatter.syntax_error(@line, @source.syntax_error))
+        puts(formatter.syntax_error(@line, @source.syntax_error))
         @source.pop
       elsif @source.code_block?
         evaluate(@source)
@@ -77,12 +77,8 @@ module IRB
     end
     
     def input_line(line)
-      output.puts(formatter.prompt(self) + line)
+      puts(formatter.prompt(self) + line)
       process_line(line)
-    end
-    
-    def output
-      @driver || $stdout
     end
     
     def formatter

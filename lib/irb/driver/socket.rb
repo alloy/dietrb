@@ -3,16 +3,6 @@ require 'socket'
 
 module IRB
   module Driver
-    class SocketTTY < TTY
-      # We don't want to put the real standard output object on the
-      # OutputRedirector target stack.
-      def assign_output_redirector!
-        before  = $stdout
-        $stdout = IRB::Driver::OutputRedirector.new
-        before
-      end
-    end
-    
     class Socket
       # Initializes with the object and binding that each new connection will
       # get as Context. The binding is shared, so local variables will stay
@@ -34,7 +24,7 @@ module IRB
           connection = @server.accept
           Thread.new do
             # assign driver with connection to current thread and start runloop
-            IRB.driver = SocketTTY.new(connection, connection)
+            IRB.driver = TTY.new(connection, connection)
             irb(@object, @binding)
             connection.close
           end
