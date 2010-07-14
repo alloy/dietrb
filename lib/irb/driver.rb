@@ -10,10 +10,11 @@ module IRB
         current_thread = Thread.current
         current_thread[:irb_driver] ||= begin
           if group = current_thread.group
+            driver = nil
             group.list.each do |thread|
-              driver = thread[:irb_driver]
-              break(driver)
+              break if driver = thread[:irb_driver]
             end
+            driver
           end
         end
       end
