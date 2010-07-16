@@ -32,9 +32,9 @@ end
 IRB.formatter.filter_from_backtrace << /^#{__FILE__}/
 
 if ARGV.empty?
-  # require 'irb/driver/readline'
+  require 'irb/driver/readline'
   # require 'irb/driver/tty'
-  require 'irb/driver/socket'
+  # require 'irb/driver/socket'
 else
   path = ARGV.shift
   require 'irb/driver/file'

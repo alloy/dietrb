@@ -24,4 +24,20 @@ describe "IRB::Driver::TTY" do
     @driver.consume(@context).should == ""
     @context.source.to_s.should == ""
   end
+
+  it "feeds input into a given context" do
+    $from_context = false
+    @driver.input.stub_input "$from_context = true", "exit"
+    @driver.run(@context)
+    $from_context.should == true
+  end
+
+  it "makes sure there's one global output redirector while running a context" do
+    before = $stdout
+    $from_context = nil
+    @driver.input.stub_input "$from_context = $stdout", "exit"
+    @driver.run(@context)
+    $from_context.class == IRB::Driver::OutputRedirector
+    $stdout.should == before
+  end
 end

@@ -1,1 +1,4 @@
 pkg
+*.swp
+extensions
+t.rb

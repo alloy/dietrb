@@ -23,22 +23,15 @@ module IRB
         ""
       end
       
+      # Feeds input into a given context.
+      #
+      # Ensures that the standard output object is a OutputRedirector, or a
+      # subclass thereof.
       def run(context)
-        ensure_output_redirector do
-          while line = consume(context)
-            continue = context.process_line(line)
-            break unless continue
-          end
+        before, $stdout = $stdout, OutputRedirector.new unless $stdout.is_a?(OutputRedirector)
+        while line = consume(context)
+          break unless context.process_line(line)
         end
-      end
-      
-      # Ensure that the standard output object is a OutputRedirector. If it's
-      # already a OutputRedirector, do nothing.
-      def ensure_output_redirector
-        unless $stdout.is_a?(IRB::Driver::OutputRedirector)
-          before, $stdout = $stdout, IRB::Driver::OutputRedirector.new
-        end
-        yield
       ensure
         $stdout = before if before
       end
