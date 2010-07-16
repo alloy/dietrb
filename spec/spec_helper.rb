@@ -16,7 +16,7 @@ $:.unshift File.join(ROOT, 'lib')
 
 require 'irb'
 
-class InputStub
+module InputStubMixin
   def stub_input(*input)
     @input = input
   end
@@ -31,7 +31,11 @@ class InputStub
   end
 end
 
-class OutputStub
+class InputStub
+  include InputStubMixin
+end
+
+module OutputStubMixin
   def printed
     @printed ||= ''
   end
@@ -47,4 +51,8 @@ class OutputStub
   def puts(*args)
     print "#{args.join("\n")}\n"
   end
+end
+
+class OutputStub
+  include OutputStubMixin
 end
