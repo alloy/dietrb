@@ -36,32 +36,23 @@ module IRB
       yield
     }
     
-    # # Returns an array of possible completion results, with the current
-    # # IRB::Context.
-    # #
-    # # This is meant to be used with Readline which takes a completion proc.
-    # def self.call(source)
-    #   new(IRB::Context.current, source).results
-    # end
-    
     attr_reader :source
-    attr_accessor :context
     
-    # def initialize(context, source)
-    #   @context, @source = context, source
-    # end
-    
-    def initialize(context = nil)
-      @context = context
+    def context
+      IRB::Driver.current.context
     end
     
+    # Returns an array of possible completion results, with the current
+    # IRB::Context.
+    #
+    # This is meant to be used with Readline which takes a completion proc.
     def call(source)
       @source = source
       results
     end
     
     def evaluate(s)
-      @context.__evaluate__(s)
+      context.__evaluate__(s)
     end
     
     def local_variables
@@ -69,7 +60,7 @@ module IRB
     end
     
     def instance_methods
-      @context.object.methods.map(&:to_s)
+      context.object.methods.map(&:to_s)
     end
     
     def instance_methods_of(klass)

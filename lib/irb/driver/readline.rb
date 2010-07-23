@@ -6,6 +6,7 @@ require 'irb/ext/completion'
 module IRB
   module Driver
     class Readline < TTY
+      
       def initialize(input = $stdin, output = $stdout)
         super
         ::Readline.input  = @input
@@ -13,10 +14,10 @@ module IRB
         ::Readline.completion_proc = IRB::Completion.new
       end
       
-      # Assigns a context to the completion object and waits for input.
-      def readline(context)
-        ::Readline.completion_proc.context = context
-        ::Readline.readline(context.prompt, true)
+      def readline
+        source = ::Readline.readline(context.prompt, true)
+        IRB::History.input(source)
+        source
       end
     end
   end

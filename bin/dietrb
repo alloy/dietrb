@@ -42,6 +42,3 @@ else
 end
 
 irb(self, TOPLEVEL_BINDING.dup)
-
-# TODO make sure!
-puts "ENDED! and this message should show up on stdout"

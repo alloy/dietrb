@@ -8,16 +8,21 @@ module IRB
       def initialize(input = $stdin, output = $stdout)
         @input  = input
         @output = output
+        @context_stack = []
       end
       
-      def readline(context)
+      def context
+        @context_stack.last
+      end
+      
+      def readline
         @output.print(context.prompt)
         @input.gets
       end
       
       # TODO make it take the current context instead of storing it
-      def consume(context)
-        readline(context)
+      def consume
+        readline
       rescue Interrupt
         context.clear_buffer
         ""
@@ -28,11 +33,13 @@ module IRB
       # Ensures that the standard output object is a OutputRedirector, or a
       # subclass thereof.
       def run(context)
+        @context_stack << context
         before, $stdout = $stdout, OutputRedirector.new unless $stdout.is_a?(OutputRedirector)
-        while line = consume(context)
+        while line = consume
           break unless context.process_line(line)
         end
       ensure
+        @context_stack.pop
         $stdout = before if before
       end
     end

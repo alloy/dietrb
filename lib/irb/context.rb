@@ -8,13 +8,9 @@ require 'irb/formatter'
 
 module IRB
   class Context
-    class << self
-      def processors
-        @processors ||= []
-      end
-    end
+    IGNORE_RESULT = :irb_ignore_result
     
-    attr_reader :object, :binding, :line, :source, :processors
+    attr_reader :object, :binding, :line, :source
     attr_accessor :formatter
     
     def initialize(object, explicit_binding = nil)
@@ -24,7 +20,6 @@ module IRB
       clear_buffer
       
       @underscore_assigner = __evaluate__("_ = nil; proc { |val| _ = val }")
-      @processors = self.class.processors.map { |processor| processor.new(self) }
     end
     
     def __evaluate__(source, file = __FILE__, line = __LINE__)
@@ -33,9 +28,11 @@ module IRB
     
     def evaluate(source)
       result = __evaluate__(source.to_s, '(irb)', @line - @source.buffer.size + 1)
-      store_result(result)
-      puts(formatter.result(result))
-      result
+      unless result == IGNORE_RESULT
+        store_result(result)
+        puts(formatter.result(result))
+        result
+      end
     rescue Exception => e
       store_exception(e)
       puts(formatter.exception(e))
@@ -54,9 +51,6 @@ module IRB
     #
     #   process_line("quit") # => false
     def process_line(line)
-      # TODO spec
-      @processors.each { |processor| line = processor.input(line) }
-      
       @source << line
       return false if @source.terminate?
       
