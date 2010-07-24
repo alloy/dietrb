@@ -69,7 +69,7 @@ describe "IRB::Formatter" do
     def object.inspect; @inspected = true; "Never called!"; end
     def object.__id__; 2158110700; end
     
-    @formatter.result(object).should == "=> #<Object:0x101444fd8>"
+    @formatter.result(object).should == "=> #<#{object.class.name}:0x101444fd8>"
     object.instance_variable_get(:@inspected).should_not == true
   end
   
