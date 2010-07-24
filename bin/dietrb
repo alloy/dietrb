@@ -7,11 +7,11 @@ IRB_CONTEXT_TOPLEVEL_ARGS = [self, TOPLEVEL_BINDING.dup]
 module IRB
   # Just a namespace so not to pollute the toplevel namespace with lvars.
   module Bin
+    driver = nil
+    ignore_irbrc = false
+    
     unless ARGV.empty?
       require 'optparse'
-      
-      driver = nil
-      ignore_irbrc = false
       
       OptionParser.new do |opt|
         bin = File.basename($0)

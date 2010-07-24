@@ -4,6 +4,15 @@ require 'socket'
 module IRB
   module Driver
     class Socket
+      class << self
+        attr_reader :instance
+        
+        def run(object, binding)
+          @instance = new(object, binding)
+          @instance.run
+        end
+      end
+      
       # Initializes with the object and binding that each new connection will
       # get as Context. The binding is shared, so local variables will stay
       # around. The benefit of this is that a socket based irb session is most
@@ -34,11 +43,16 @@ module IRB
   end
 end
 
-def self.irb(object, binding = nil)
-  unless @server
-    @server = IRB::Driver::Socket.new(object, binding)
-    @server.run
-  else
-    super
+module Kernel
+  alias_method :irb_before_socket, :irb
+  
+  def irb(object, binding = nil)
+    if IRB::Driver::Socket.instance.nil?
+      IRB::Driver::Socket.run(object, binding)
+    else
+      irb_before_socket(object, binding)
+    end
   end
+  
+  private :irb, :irb_before_socket
 end
