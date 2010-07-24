@@ -49,15 +49,7 @@ The original IRB will still work when you uninstall the DietRB gem, though.
   
   * Kernel#clear_history! will clear the history and the history file.
 
-* irb/ext/macruby.rb, adds support for Cocoa development by starting an
-  NSRunloop. Loaded by default on MacRuby.
-
 == Differences
-
-* This IRB version specifically targets MacRuby, for now, and allows Cocoa
-  development to be done from the command-line. Dietrb will automatically
-  override the normal runloop to be ran in a thread and start a NSRunLoop on
-  the main thread.
 
 * Dietrb will try to warn about syntax errors as soon as a line is entered and
   only reset the buffer to the previous line. This means that you don't need to
@@ -112,29 +104,3 @@ Normal usage:
   irb(#<#<Class:…>::A:…>):002:0> quit
   => nil
   irb(main):007:0> quit
-
-Or on MacRuby, try:
-
-  irb(main):001:0> win = NSWindow.alloc.initWithContentRect([200, 300, 250, 100],
-  irb(main):002:0>                                styleMask: NSTitledWindowMask|NSResizableWindowMask,
-  irb(main):003:0>                                  backing: NSBackingStoreBuffered,
-  irb(main):004:0>                                    defer: false)
-  => #<NSWindow:0x20023eb00>
-  irb(main):005:0> win.orderFrontRegardless
-  => #<NSWindow:0x20023eb00>
-  irb(main):006:0> win.title = 'Hello World'
-  => "Hello World"
-  irb(main):007:0> bye = NSButton.alloc.initWithFrame([10, 10, 80, 80])
-  => #<NSButton:0x20027f820>
-  irb(main):008:0> win.contentView.addSubview(bye)
-  => #<NSView:0x200210320>
-  irb(main):009:0> bye.bezelStyle = NSThickerSquareBezelStyle
-  => 4
-  irb(main):010:0> bye.title = 'Goodbye!'
-  => "Goodbye!"
-  irb(main):011:0> bye.target = NSApp
-  => #<NSApplication:0x200257fe0>
-  irb(main):012:0> bye.action = 'terminate:'
-  => "terminate:"
-  irb(main):013:0> bye.sound = NSSound.soundNamed('Basso')
-  => #<NSSound:0x200248b20>
