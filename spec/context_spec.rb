@@ -12,7 +12,7 @@ main = self
 describe "IRB::Context" do
   before do
     @context = IRB::Context.new(main)
-    @context.io = @io = CaptureIO.new
+    @context.extend(OutputStubMixin)
   end
   
   it "initializes with an object and stores a copy of its binding" do
@@ -35,36 +35,15 @@ describe "IRB::Context" do
     @context.source.to_s.should == ""
   end
   
-  it "initializes with an instance of each processor" do
-    before = IRB::Context.processors.dup
-    begin
-      IRB::Context.processors << TestProcessor
-      @context = IRB::Context.new(main)
-      @context.processors.last.class.should == TestProcessor
-    ensure
-      IRB::Context.processors.replace(before)
-    end
-  end
-  
   it "does not use the same binding copy of the top level object" do
     lambda { eval("x", @context.binding) }.should raise_error(NameError)
-  end
-  
-  it "makes itself the current running context during the runloop and resigns once it's done" do
-    IRB::Context.current.should == nil
-    
-    @io.stub_input("current_during_run = IRB::Context.current")
-    @context.run
-    eval('current_during_run', @context.binding).should == @context
-    
-    IRB::Context.current.should == nil
   end
 end
 
 describe "IRB::Context, when evaluating source" do
   before do
     @context = IRB::Context.new(main)
-    @context.io = @io = CaptureIO.new
+    @context.extend(OutputStubMixin)
     IRB.formatter = IRB::Formatter.new
   end
   
@@ -74,7 +53,7 @@ describe "IRB::Context, when evaluating source" do
   
   it "prints the result" do
     @context.evaluate("Hash[:foo, :foo]")
-    @io.printed.should == "=> {:foo=>:foo}\n"
+    @context.printed.should == "=> {:foo=>:foo}\n"
   end
   
   it "assigns the result to the local variable `_'" do
@@ -105,48 +84,31 @@ describe "IRB::Context, when evaluating source" do
   
   it "prints the exception that occurs" do
     @context.evaluate("DoesNotExist")
-    @io.printed.should =~ /^NameError:.+DoesNotExist/
+    @context.printed.should =~ /^NameError:.+DoesNotExist/
   end
   
   it "uses the line number of the *first* line in the buffer, for the line parameter of eval" do
     @context.process_line("DoesNotExist")
-    @io.printed.should =~ /\(irb\):1:in/
+    @context.printed.should =~ /\(irb\):1:in/
     @context.process_line("class A")
     @context.process_line("DoesNotExist")
     @context.process_line("end")
-    @io.printed.should =~ /\(irb\):3:in.+\(irb\):2:in/m
+    @context.printed.should =~ /\(irb\):3:in.+\(irb\):2:in/m
   end
   
-  it "inputs a line to be processed, skipping readline" do
-    expected = "#{@context.formatter.prompt(@context)}2 * 21\n=> 42\n"
-    @context.input_line("2 * 21")
-    @io.printed.should == expected
+  it "ignores the result if it's IRB::Context::IGNORE_RESULT" do
+    @context.evaluate(":bananas")
+    @context.evaluate("IRB::Context::IGNORE_RESULT").should == nil
+    @context.printed.should == "=> :bananas\n"
+    @context.evaluate("_").should == :bananas
   end
 end
 
 describe "IRB::Context, when receiving input" do
   before do
     @context = IRB::Context.new(main)
-    @context.io = @io = CaptureIO.new
-  end
-  
-  it "prints the prompt and reads a line" do
-    @io.stub_input("def foo")
-    @context.readline_from_io.should == "def foo"
-    @io.printed.should == "irb(main):001:0> "
-  end
-  
-  it "passes the input to all processors, which may return a new value" do
-    @context.processors << TestProcessor.new
-    @io.stub_input("foo")
-    @context.readline_from_io.should == "foofoo"
-  end
-  
-  it "processes the output" do
-    @io.stub_input("def foo")
-    def @context.process_line(line); @received = line; false; end
-    @context.run
-    @context.instance_variable_get(:@received).should == "def foo"
+    @context.extend(InputStubMixin)
+    @context.extend(OutputStubMixin)
   end
   
   it "adds the received code to the source buffer" do
@@ -155,17 +117,9 @@ describe "IRB::Context, when receiving input" do
     @context.source.to_s.should == "def foo\np :ok"
   end
   
-  it "clears the source buffer when an Interrupt signal is received" do
+  it "clears the source buffer" do
     @context.process_line("def foo")
-    
-    def @io.readline(prompt)
-      unless @raised
-        @raised = true
-        raise Interrupt
-      end
-    end
-    
-    lambda { @context.run }.should_not raise_error(Interrupt)
+    @context.clear_buffer
     @context.source.to_s.should == ""
   end
   
@@ -193,7 +147,7 @@ describe "IRB::Context, when receiving input" do
     @context.process_line("  };")
     
     @context.source.to_s.should == "def foo"
-    @io.printed.should == "SyntaxError: compile error\n(irb):2: syntax error, unexpected '}'\n"
+    @context.printed.should == "SyntaxError: compile error\n(irb):2: syntax error, unexpected '}'\n"
   end
   
   it "returns whether or not the runloop should continue, but only if the level is 0" do
@@ -204,20 +158,9 @@ describe "IRB::Context, when receiving input" do
     @context.process_line("quit").should == false
   end
   
-  it "exits the runloop if the user wishes so" do
-    @io.stub_input("quit", "def foo")
-    def @context.process_line(line); @received = line; super; end
-    @context.run
-    @context.instance_variable_get(:@received).should_not == "def foo"
-  end
-end
-
-describe "Kernel::irb" do
-  it "creates a new context for the given object and runs it" do
-    IRB.io = CaptureIO.new
-    IRB.io.stub_input("::IRBRan = self")
-    o = Object.new
-    irb(o)
-    IRBRan.should == o
+  it "inputs a line to be processed" do
+    expected = "#{@context.formatter.prompt(@context)}2 * 21\n=> 42\n"
+    @context.input_line("2 * 21")
+    @context.printed.should == expected
   end
 end

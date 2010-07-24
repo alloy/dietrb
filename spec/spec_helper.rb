@@ -51,8 +51,25 @@ module OutputStubMixin
   def puts(*args)
     print "#{args.join("\n")}\n"
   end
+  
+  def clear_printed!
+    @printed = ''
+  end
 end
 
 class OutputStub
   include OutputStubMixin
+end
+
+class StubDriver
+  attr_reader :context
+  attr_writer :output
+  
+  def initialize(context = nil)
+    @context = context
+  end
+  
+  def output
+    @output || $stdout
+  end
 end

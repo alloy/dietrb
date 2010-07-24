@@ -1,14 +1,6 @@
 require File.expand_path('../spec_helper', __FILE__)
 require 'irb/driver'
 
-class StubDriver
-  attr_writer :output
-  
-  def output
-    @output || $stdout
-  end
-end
-
 describe "IRB::Driver" do
   before :all do
     @driver = StubDriver.new

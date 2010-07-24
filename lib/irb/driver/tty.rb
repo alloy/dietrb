@@ -3,7 +3,7 @@ require 'irb/driver'
 module IRB
   module Driver
     class TTY
-      attr_reader :input, :output
+      attr_reader :input, :output, :context_stack
       
       def initialize(input = $stdin, output = $stdout)
         @input  = input

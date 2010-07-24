@@ -40,6 +40,7 @@ describe "IRB::Driver::Readline" do
   before do
     @driver = IRB::Driver::Readline.new(InputStub.new, OutputStub.new)
     @context = IRB::Context.new(Object.new)
+    @driver.context_stack << @context
   end
 
   it "is a subclass of IRB::Driver::TTY" do
@@ -57,19 +58,13 @@ describe "IRB::Driver::Readline" do
 
   it "reads a line through the Readline module" do
     Readline.stub_input "nom nom nom"
-    @driver.readline(@context).should == "nom nom nom"
-  end
-
-  it "assigns the context as the current context to the completion object" do
-    Readline.stub_input "nom nom nom"
-    @driver.readline(@context)
-    Readline.completion_proc.context.should == @context
+    @driver.readline.should == "nom nom nom"
   end
 
   it "tells the Readline module to use the history" do
     Readline.use_history = false
     Readline.stub_input "nom nom nom"
-    @driver.readline(@context)
+    @driver.readline
     Readline.use_history.should == true
   end
 end
