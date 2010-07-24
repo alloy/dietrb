@@ -8,7 +8,9 @@ Portions Copyright (c):
 * 2006-2010 Revieworld Ltd. <http://github.com/floehopper/mocha>
             (class/address object inspect)
 * 2008-2010 Vincent Isambart <http://github.com/vincentisambart/hotconsole>
-            (Output redirection on different threads)
+            (output redirection on different threads)
+* 2010      James Tucker <http://github.com/raggi/ir>
+            (basis of driver code and inspiration)
 
 This software is available under the Ruby license:
 
