@@ -19,7 +19,8 @@ module IRB
       @line    = 1
       clear_buffer
       
-      @underscore_assigner = __evaluate__("_ = nil; proc { |val| _ = val }")
+      @last_result_assigner = __evaluate__("_ = nil; proc { |val| _ = val }")
+      @exception_assigner   = __evaluate__("e = exception = nil; proc { |ex| e = exception = ex }")
     end
     
     def __evaluate__(source, file = __FILE__, line = __LINE__)
@@ -84,11 +85,11 @@ module IRB
     end
     
     def store_result(result)
-      @underscore_assigner.call(result)
+      @last_result_assigner.call(result)
     end
     
     def store_exception(exception)
-      $e = $EXCEPTION = exception
+      @exception_assigner.call(exception)
     end
   end
 end

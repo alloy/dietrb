@@ -75,11 +75,11 @@ describe "IRB::Context, when evaluating source" do
     }.should_not.raise_error
   end
   
-  it "assigns the last raised exception to the global variable `$EXCEPTION' / `$e'" do
+  it "assigns the last raised exception to the variables `exception' / `e'" do
     @context.evaluate("DoesNotExist")
-    $EXCEPTION.class.should == NameError
-    $EXCEPTION.message.should include('DoesNotExist')
-    $e.should == $EXCEPTION
+    @context.__evaluate__("exception").class.should == NameError
+    @context.__evaluate__("exception").message.should include('DoesNotExist')
+    @context.__evaluate__("e").should == @context.__evaluate__("exception")
   end
   
   it "prints the exception that occurs" do
