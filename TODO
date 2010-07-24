@@ -1,3 +1,4 @@
+* Write docs for using a as library. Probably right after creating a Cocoa client.
 * Add specs for irb/driver/socket, and possibly for bin/dietrb
 * Configurable history file? (:HISTORY_FILE) Configurable number of saved history lines? (:SAVE_HISTORY)
 * Make sure the following formatters work: hirb, awesome_print, and looksee
