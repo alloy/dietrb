@@ -58,8 +58,8 @@ describe "IRB::History" do
     @history.input "puts :ok"
     @history.input "foo(x)"
     
-    IRB::History.initialize
-    IRB::History.initialize
+    IRB::History.setup
+    IRB::History.setup
     
     Readline::HISTORY.to_a.should == ["puts :ok", "foo(x)"]
   end

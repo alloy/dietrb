@@ -11,7 +11,7 @@ module IRB
     class << self
       attr_accessor :file, :max_entries_in_overview
       
-      def initialize
+      def setup
         to_a.each do |source|
           Readline::HISTORY.push(source)
         end if Readline::HISTORY.to_a.empty?
@@ -89,4 +89,4 @@ end
 
 IRB::History.file = File.expand_path("~/.irb_history")
 IRB::History.max_entries_in_overview = 50
-IRB::History.initialize
+IRB::History.setup
