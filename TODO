@@ -1,4 +1,4 @@
-* Make puts/print use the proper IO when used from user code
+* Add specs for irb/driver/socket, and possibly for bin/dietrb
 * Configurable history file? (:HISTORY_FILE) Configurable number of saved history lines? (:SAVE_HISTORY)
 * Make sure the following formatters work: hirb, awesome_print, and looksee
 * Make sure the majority of the utils in utility_belt work
