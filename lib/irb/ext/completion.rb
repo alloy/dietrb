@@ -117,6 +117,8 @@ module IRB
           if results = (methods || methods_of_object(root))
             format_methods(receiver, results, filter)
           else
+            # this is mainly because MacRuby currently has a problem with local_variables,
+            # normally I'd prefer to let the program die so the user might report it
             []
           end
         else
