@@ -1,3 +1,4 @@
+* Make Context take a ‘driver’ again, because we do not always want to redirect $stdout, but still receive output from the context. Ie, result, exception etc. A situation where we don’t want to redirect $stdout is in a server app.
 * Don't use load the output redirection lib by default (ie when using standard tty/readline)
 * Write docs for using a as library. Probably right after creating a Cocoa client.
 * Add specs for irb/driver/socket, and possibly for bin/dietrb
