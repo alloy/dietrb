@@ -188,17 +188,50 @@ describe "IRB::Source::Reflector" do
   it "correctly increases and decreases the code block indentation level for literals" do
     [
       ["lambda { |x|", "}"],
-      ["{", "}"],
-      ["[", "]"],
-      ["'", "'"],
-      ['"', '"'],
-      ["%{", "}"],
-      ["%w{", "}"],
-      ["%r{", "}"],
-      ["/", "/"]
+      ["{ :foo => ", " :bar }"],
+      ["[ 1", ", 2 ]"],
+
+      ["'foo ", " bar'"],
+      ["' foo ", " bar '"],
+
+      ['"foo ', ' bar"'],
+      ['" foo ', ' bar "'],
+
+      ["%{foo ", " bar}"],
+      ["%{ foo ", " bar }"],
+      ["%(foo ", " bar)"],
+      ["%( foo ", " bar )"],
+      ["%[ foo ", " bar ]"],
+      ["%[foo ", " bar]"],
+
+      ["%w{foo ", " bar}"],
+      ["%w{ foo ", " bar }"],
+      ["%w(foo ", " bar)"],
+      ["%w( foo ", " bar )"],
+      ["%w[foo ", " bar]"],
+      ["%w[ foo ", " bar ]"],
+
+      ["%W{foo ", " bar}"],
+      ["%W{ foo ", " bar }"],
+      ["%W(foo ", " bar)"],
+      ["%W( foo ", " bar )"],
+      ["%W[foo ", " bar]"],
+      ["%W[ foo ", " bar ]"],
+
+      ["%r{foo ", " bar}"],
+      ["%r{ foo ", " bar }"],
+      ["%r(foo ", " bar)"],
+      ["%r( foo ", " bar )"],
+      ["%r[foo ", " bar]"],
+      ["%r[ foo ", " bar ]"],
+
+      ["/foo ", " bar/"],
+      ["/ foo ", " bar /"],
     ].each do |open, close|
       reflect(open).level.should == 1
+      reflect(open).code_block?.should == false
       reflect("#{open}\n#{close}").level.should == 0
+      reflect("#{open}\n#{close}").code_block?.should == true
     end
   end
 end
