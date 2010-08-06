@@ -140,11 +140,14 @@ describe "IRB::Source::Reflector" do
   it "returns whether or not the source contains a syntax error, except a code block not ending" do
     reflect("def;").syntax_error?.should == true
     reflect("def;").syntax_error?.should == true
+    reflect("{ [ } ]").syntax_error?.should == true
     reflect("def foo").syntax_error?.should == false
     reflect("class A; }").syntax_error?.should == true
     reflect("class A; {" ).syntax_error?.should == false
+    reflect("class A; def {").syntax_error?.should == true
     reflect("class A def foo").syntax_error?.should == true
     reflect("class A; def foo" ).syntax_error?.should == false
+    reflect("def foo; {; end; }").syntax_error?.should == true
   end
   
   it "returns the actual syntax error message if one occurs" do
