@@ -186,8 +186,13 @@ describe "IRB::Source::Reflector" do
     [
       ["lambda { |x|", "}"],
       ["{", "}"],
-      ['"#{', '}"'],
-      ["[", "]"]
+      ["[", "]"],
+      ["'", "'"],
+      ['"', '"'],
+      ["%{", "}"],
+      ["%w{", "}"],
+      ["%r{", "}"],
+      ["/", "/"]
     ].each do |open, close|
       reflect(open).level.should == 1
       reflect("#{open}\n#{close}").level.should == 0

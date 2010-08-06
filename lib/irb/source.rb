@@ -183,6 +183,36 @@ module IRB
         @level -= 1
         super
       end
+
+      def on_tstring_beg(token)
+        @level += 1
+        super
+      end
+
+      def on_tstring_end(token)
+        @level -= 1
+        super
+      end
+
+      def on_qwords_beg(token)
+        @level += 1
+        super
+      end
+
+      def on_words_sep(token)
+        @level -= 1
+        super
+      end
+
+      def on_regexp_beg(token)
+        @level += 1
+        super
+      end
+
+      def on_regexp_end(token)
+        @level -= 1
+        super
+      end
     end
   end
 end
