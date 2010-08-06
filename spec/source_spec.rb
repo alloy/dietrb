@@ -191,12 +191,18 @@ describe "IRB::Source::Reflector" do
       ["{ :foo => ", " :bar }"],
       ["[ 1", ", 2 ]"],
 
+      ["'", "'"],
+      ["' ", " '"],
       ["'foo ", " bar'"],
       ["' foo ", " bar '"],
 
+      ['"', '"'],
+      ['" ', ' "'],
       ['"foo ', ' bar"'],
       ['" foo ', ' bar "'],
 
+      ["%{", "}"],
+      ["%{ ", " }"],
       ["%{foo ", " bar}"],
       ["%{ foo ", " bar }"],
       ["%(foo ", " bar)"],
@@ -204,6 +210,7 @@ describe "IRB::Source::Reflector" do
       ["%[ foo ", " bar ]"],
       ["%[foo ", " bar]"],
 
+      ["%w{ ", " }"],
       ["%w{foo ", " bar}"],
       ["%w{ foo ", " bar }"],
       ["%w(foo ", " bar)"],
@@ -232,6 +239,17 @@ describe "IRB::Source::Reflector" do
       reflect(open).code_block?.should == false
       reflect("#{open}\n#{close}").level.should == 0
       reflect("#{open}\n#{close}").code_block?.should == true
+    end
+  end
+
+  it "handles cases that contain backspaces" do
+    [
+      ["%{", "\b"],
+      ["%w{", "\b"],
+      ["%r{", "\b"],
+    ].each do |open, close|
+      reflect("#{open}\n#{close}").level.should == 1
+      reflect("#{open}\n#{close}").code_block?.should == false
     end
   end
 end

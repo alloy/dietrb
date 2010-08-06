@@ -191,7 +191,7 @@ module IRB
       end
 
       def on_tstring_end(token)
-        if tokens_match?(@in_string, token)
+        if @in_string && tokens_match?(@in_string, token)
           @in_string = nil
           @level -= 1
         end
