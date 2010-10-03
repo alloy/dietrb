@@ -31,12 +31,12 @@ module IRB
       result = __evaluate__(source.to_s, '(irb)', @line - @source.buffer.size + 1)
       unless result == IGNORE_RESULT
         store_result(result)
-        puts(formatter.result(result))
+        output(formatter.result(result))
         result
       end
     rescue Exception => e
       store_exception(e)
-      puts(formatter.exception(e))
+      output(formatter.exception(e))
     end
     
     # Returns whether or not the user wants to continue the current runloop.
@@ -56,7 +56,7 @@ module IRB
       return false if @source.terminate?
       
       if @source.syntax_error?
-        puts(formatter.syntax_error(@line, @source.syntax_error))
+        output(formatter.syntax_error(@line, @source.syntax_error))
         @source.pop
       elsif @source.code_block?
         evaluate(@source)
@@ -67,12 +67,22 @@ module IRB
       true
     end
     
+    # Output is directed to the IRB::Driver.current driver’s output if a
+    # current driver is available. Otherwise it’s simply printed to $stdout.
+    def output(string)
+      if driver = IRB::Driver.current
+        driver.output.puts(string)
+      else
+        puts(string)
+      end
+    end
+    
     def prompt
       formatter.prompt(self)
     end
     
     def input_line(line)
-      puts(formatter.prompt(self) + line)
+      output(formatter.prompt(self) + line)
       process_line(line)
     end
     
