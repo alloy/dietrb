@@ -1,3 +1,6 @@
+IMPORTANT! THIS REPO HAS BEEN MOVED TO http://svn.macosforge.org/repository/ruby/DietRB/trunk
+AND IS AVAILABLE AS A GIT MIRROR ON http://github.com/MacRuby/DietRB.
+
 = IRB on a diet, for MacRuby / Ruby 1.9
 
 The goal is to have a small and cleaned up version of IRB. Trimmed down to only
